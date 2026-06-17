@@ -2,16 +2,32 @@
 
 ## The meme coin for the people who actually build the world.
 
-### Built by Tilers. For Builders.
+🧱 Built by Tilers. For Builders.
 
-KERAM is a community project inspired by tilers, builders and craftsmen worldwide.
+🚀 Build your dreams. Build your world.
 
-### Mission
+---
 
-To celebrate the people who build, create and take pride in their work.
+## Why KERAM?
 
-### Community
+The world is built every day by people who rarely get the spotlight.
 
-For tilers, builders, craftsmen and everyone who creates something with their own hands.
+The people who wake up early.
+The people who work with their hands.
+The people who create, repair, improve and build.
+
+Not for fame.
+
+Not for headlines.
+
+Because that's who they are.
+
+---
+
+## Community
+
+We are all builders in different ways, but always builders.
+
+---
 
 🚀 One Tile at a Time to the Moon.
