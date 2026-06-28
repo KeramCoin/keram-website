@@ -1,0 +1,63 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+  background:
+    linear-gradient(rgba(0,0,0,.18), rgba(0,0,0,.55)),
+    url("assets/background.png") center center / cover no-repeat fixed;
+}
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.logo {
+  width: min(430px, 82vw);
+  height: auto;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  object-fit: cover;
+  filter: drop-shadow(0 18px 35px rgba(0,0,0,.75));
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(64px, 11vw, 135px);
+  letter-spacing: 10px;
+  color: #ffffff;
+  text-shadow: 0 8px 26px rgba(0,0,0,.75);
+}
+
+h2 {
+  max-width: 900px;
+  margin: 14px 0 8px;
+  font-size: clamp(24px, 4vw, 42px);
+  line-height: 1.12;
+  color: #ffffff;
+  text-shadow: 0 6px 20px rgba(0,0,0,.85);
+}
+
+p {
+  margin: 0;
+  font-size: clamp(17px, 2vw, 25px);
+  text-shadow: 0 5px 18px rgba(0,0,0,.9);
+}
+
+.manifest {
+  margin-top: 26px;
+  font-size: clamp(20px, 2.7vw, 34px);
+  line-height: 1.25;
+  color: #f6c56f;
+  font-weight: 700;
+}
