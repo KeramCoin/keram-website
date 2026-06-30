@@ -168,4 +168,35 @@ h2{
     .tagline{
         font-size:20px;
     }
+}/* ---------- STORY ---------- */
+
+.story{
+    padding:120px 20px;
+    background:rgba(8,12,25,.88);
+}
+
+.story-box{
+    max-width:900px;
+    margin:auto;
+    text-align:center;
+}
+
+.story h2{
+    color:#f6c56f;
+    font-size:52px;
+    margin-bottom:40px;
+}
+
+.story p{
+    font-size:22px;
+    line-height:1.8;
+    margin-bottom:28px;
+    color:#ececec;
+}
+
+.story-highlight{
+    color:#f6c56f !important;
+    font-size:30px !important;
+    font-weight:bold;
+    margin-top:40px;
 }
