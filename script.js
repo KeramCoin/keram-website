@@ -1,1 +1,1 @@
-document.querySelector('.btn').addEventListener('mouseenter',()=>{});
+document.getElementById('copy')?.addEventListener('click',async()=>{const a='KERAM_TOKEN_ADDRESS_COMING_SOON';try{await navigator.clipboard.writeText(a);document.getElementById('status').textContent='Copied placeholder. Official token address will be added here.'}catch(e){document.getElementById('status').textContent=a}});
