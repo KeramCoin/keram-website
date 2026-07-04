@@ -7,7 +7,24 @@ body{min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:var(--cream);
 .nav{position:fixed;top:0;left:0;right:0;z-index:20;height:72px;display:flex;justify-content:space-between;align-items:center;padding:0 7vw;background:rgba(2,6,14,.82);border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(18px)}
 .nav a{color:white;text-decoration:none;font-weight:700;font-size:.92rem}
 .brand{color:var(--gold)!important;letter-spacing:.16em;font-size:1.35rem!important;font-weight:900!important}
-.nav-links{display:flex;gap:28px;align-items:center}
+.nav a{
+  color:white;
+  text-decoration:none;
+  font-weight:700;
+  font-size:.92rem;
+  padding:8px 16px;
+  border:1px solid rgba(244,201,93,.25);
+  border-radius:999px;
+  background:rgba(255,255,255,.04);
+  transition:.2s ease;
+}
+
+.nav a:hover{
+  color:var(--gold);
+  border-color:var(--gold);
+  background:rgba(244,201,93,.12);
+}
+}
 .buy-nav{background:linear-gradient(135deg,#ffe8a0,var(--gold),#b47b16);color:#111!important;padding:12px 20px;border-radius:8px}
 .hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:110px 24px 80px;overflow:hidden}
 .hero-glow{position:absolute;top:80px;width:min(560px,90vw);height:min(560px,90vw);border-radius:50%;background:radial-gradient(circle,rgba(244,201,93,.35),rgba(244,201,93,.08) 42%,transparent 68%);filter:blur(14px);z-index:-1}
@@ -65,3 +82,9 @@ h2{font-size:clamp(2rem,4vw,3.4rem);line-height:1.05;color:var(--gold);letter-sp
 .footer strong{color:var(--gold);letter-spacing:.18em}
 @media(max-width:900px){.nav-links a:not(.buy-nav){display:none}.cards,.about,.buy-section{grid-template-columns:1fr}.section-title span{display:none}}
 @media(max-width:560px){.nav{padding:0 20px}h1{font-size:3.4rem}.hero-logo{width:210px}.btn{width:100%}.cards article{grid-template-columns:1fr;text-align:center}.footer{flex-direction:column;text-align:center}}
+.nav-links a{
+  padding:10px 16px;
+  border:1px solid rgba(244,201,93,.28);
+  border-radius:999px;
+  background:rgba(0,0,0,.28);
+}
