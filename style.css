@@ -24,3 +24,13 @@ animation:float 5s ease-in-out infinite;
   line-height:1.8;
   color:#d9dde7;
 }
+.bg{
+    position:fixed;
+    inset:0;
+    z-index:-10;
+    background:url("assets/background.png") center center / cover no-repeat;
+}
+
+body{
+    background:#050812;
+}
