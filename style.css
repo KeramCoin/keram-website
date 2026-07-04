@@ -26,7 +26,12 @@ h1{font-size:clamp(4rem,10vw,8.8rem);line-height:.88;letter-spacing:-.07em;font-
 .btn{display:inline-flex;align-items:center;justify-content:center;min-width:210px;padding:17px 28px;border-radius:8px;text-decoration:none;font-weight:900;letter-spacing:.04em;transition:.22s ease}
 .btn:hover{transform:translateY(-3px)}
 .btn-gold{background:linear-gradient(135deg,#ffe8a0,var(--gold),#ad7418);color:#111;box-shadow:0 18px 50px rgba(244,201,93,.25)}
-.btn-outline{color:var(--gold);border:1px solid var(--gold);background:rgba(0,0,0,.32)}
+.btn-outline{
+background:linear-gradient(135deg,#ffe8a0,var(--gold),#ad7418);
+color:#111;
+border:none;
+box-shadow:0 18px 50px rgba(244,201,93,.25);
+}
 .section{width:min(1180px,92%);margin:0 auto;padding:80px 0}
 .section-title{display:flex;align-items:center;justify-content:center;gap:28px;margin-bottom:18px}
 .section-title span{width:120px;height:1px;background:var(--line)}
