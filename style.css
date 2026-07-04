@@ -11,7 +11,9 @@ body{min-height:100vh;font-family:Arial,Helvetica,sans-serif;color:var(--cream);
 .buy-nav{background:linear-gradient(135deg,#ffe8a0,var(--gold),#b47b16);color:#111!important;padding:12px 20px;border-radius:8px}
 .hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:110px 24px 80px;overflow:hidden}
 .hero-glow{position:absolute;top:80px;width:min(560px,90vw);height:min(560px,90vw);border-radius:50%;background:radial-gradient(circle,rgba(244,201,93,.35),rgba(244,201,93,.08) 42%,transparent 68%);filter:blur(14px);z-index:-1}
-.hero-logo{width:min(300px,62vw);height:auto;display:block;margin:0 auto 24px;filter:drop-shadow(0 0 46px rgba(244,201,93,.55))}
+.hero-logo{.hero-logo{
+width:360px;
+max-width:75vw;
 .eyebrow{color:var(--gold);letter-spacing:.24em;font-size:.78rem;font-weight:900;margin-bottom:22px}
 h1{font-size:clamp(4rem,10vw,8.8rem);line-height:.88;letter-spacing:-.07em;font-weight:900;color:var(--cream);text-shadow:0 8px 45px rgba(0,0,0,.5)}
 .hero-text{max-width:850px;margin:20px auto 0;color:white;font-size:clamp(1rem,2vw,1.35rem);line-height:1.6}
