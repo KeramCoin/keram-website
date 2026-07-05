@@ -216,3 +216,31 @@ h2{font-size:clamp(2.2rem,4vw,3.4rem);line-height:1.05;color:var(--gold);letter-
   flex-wrap:wrap;
 }
 
+.token-address{
+  margin:22px 0 26px;
+  padding:14px 16px;
+  border:1px solid rgba(244,201,93,.25);
+  border-radius:10px;
+  background:rgba(0,0,0,.22);
+}
+
+.token-address strong{
+  display:block;
+  color:var(--gold);
+  margin-bottom:8px;
+}
+
+.token-address code{
+  display:block;
+  padding:10px 12px;
+  margin-top:8px;
+  background:rgba(0,0,0,.35);
+  border:1px solid rgba(244,201,93,.18);
+  border-radius:8px;
+  color:var(--gold);
+  font-family:monospace;
+  font-size:.88rem;
+  line-height:1.45;
+  word-break:break-all;
+  user-select:all;
+}
