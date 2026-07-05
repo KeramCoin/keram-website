@@ -115,7 +115,11 @@ h2{font-size:clamp(2.2rem,4vw,3.4rem);line-height:1.05;color:var(--gold);letter-
 .steps strong{color:var(--gold);font-size:1.6rem}
 .steps span{color:white;line-height:1.4}
 
-.community{text-align:center}
+.community{
+  text-align:center;
+  min-height:60vh;
+  padding-top:120px;
+}
 .community h2{margin-bottom:14px}
 .community p{color:white;margin-bottom:24px}
 .socials{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
