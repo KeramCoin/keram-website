@@ -280,3 +280,60 @@ h2{font-size:clamp(2.2rem,4vw,3.4rem);line-height:1.05;color:var(--gold);letter-
   line-height:1.8;
   font-weight:500;
 }
+
+/* ===== Builder Hub ===== */
+
+.hub-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    width:100%;
+    max-width:1000px;
+    gap:24px;
+    margin:40px auto 0;
+    align-items:stretch;
+}
+
+.hub-card{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+
+    background:rgba(10,18,32,.65);
+    border:1px solid rgba(244,201,93,.18);
+    border-radius:18px;
+    padding:28px;
+    text-align:left;
+    backdrop-filter:blur(12px);
+    transition:.25s;
+}
+
+.hub-card:hover{
+    transform:translateY(-4px);
+    border-color:#f4c95d;
+    box-shadow:0 0 25px rgba(244,201,93,.15);
+}
+
+.hub-card h3{
+    color:#f4c95d;
+    margin-bottom:14px;
+    font-size:1.35rem;
+}
+
+.hub-card p{
+    color:#d5d5d5;
+    line-height:1.7;
+}
+
+.hub-link{
+    display:inline-block;
+    margin-top:18px;
+    color:#f4c95d;
+    text-decoration:none;
+    font-weight:600;
+    transition:.25s;
+}
+
+.hub-link:hover{
+    color:#ffffff;
+    transform:translateX(6px);
+}
