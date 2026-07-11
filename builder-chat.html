@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Builder Chat | KERAM</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+</head>
+
+<body>
+
+<nav class="nav">
+    <a class="brand" href="index.html">KERAM</a>
+
+    <div class="nav-links">
+        <a href="index.html">← Back to Home</a>
+    </div>
+</nav>
+
+<section class="section">
+
+<div class="glass">
+
+<h1>Builder Chat</h1>
+
+<p class="builder-subtitle">
+Talk. Laugh. Meet other builders.
+</p>
+
+<div id="chat-window" class="chat-window">
+
+<div class="chat-message">
+<strong>System</strong><br>
+Welcome to Builder Chat.
+</div>
+
+</div>
+
+<form id="chat-form" class="chat-form">
+
+<input
+id="username"
+type="text"
+placeholder="Your name"
+required>
+
+<input
+id="message"
+type="text"
+placeholder="Write a message..."
+required>
+
+<button class="btn btn-gold">
+Send
+</button>
+
+</form>
+
+</div>
+
+</section>
+
+<script>
+
+const form=document.getElementById("chat-form");
+const windowBox=document.getElementById("chat-window");
+
+form.addEventListener("submit",function(e){
+
+e.preventDefault();
+
+const user=document.getElementById("username").value;
+const msg=document.getElementById("message").value;
+
+const div=document.createElement("div");
+
+div.className="chat-message";
+
+div.innerHTML="<strong>"+user+"</strong><br>"+msg;
+
+windowBox.appendChild(div);
+
+windowBox.scrollTop=windowBox.scrollHeight;
+
+document.getElementById("message").value="";
+
+});
+
+</script>
+
+</body>
+</html>

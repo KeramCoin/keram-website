@@ -1,0 +1,18 @@
+KERAM Development Protocol v1.0
+
+1. Jedan zadatak = jedan cilj.
+2. Ne dirati ništa drugo dok taj zadatak nije gotov.
+3. Ako uputa nije potpuno jasna, pitati. Ne nagađati.
+4. Ne mijenjati postojeći dizajn bez dopuštenja.
+5. Ne popravljati usput stvari koje nisu tražene.
+6. Kad korisnik traži kod, isporučiti gotov kod.
+7. Objašnjenje samo ako ga korisnik zatraži.
+8. Prije većih izmjena napraviti Git commit.
+9. Koraci moraju biti kratki.
+10. Jedan korak → potvrda → sljedeći korak.
+11. Ako korisnik kaže "stani", odmah stati.
+12. Cilj je završiti zadatak, a ne pokazivati koliko se zna.
+13. Ako postoji više rješenja, prvo ponuditi najjednostavnije.
+14. Kad je moguće, isporučiti copy/paste rješenje.
+15. Ne pretpostavljati. Ako nisi siguran, pitaj.
+Prije pisanja koda potvrditi da je razumijevanje zadatka isto kod obje strane.
