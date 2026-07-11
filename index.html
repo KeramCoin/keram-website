@@ -2,229 +2,358 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>KERAM — We Are All Builders</title>
   <link rel="stylesheet" href="style.css?v=9">
   <link rel="icon" type="image/png" href="assets/favicon.png">
-<link rel="apple-touch-icon" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/favicon.png">
+
+  <!-- Privacy dropdown styles. These are kept here so the dropdown works
+       without requiring changes to style.css. -->
+  <style>
+    .privacy-dropdown {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .privacy-dropbtn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      letter-spacing: inherit;
+      text-transform: inherit;
+      cursor: pointer;
+    }
+
+    .privacy-dropbtn:focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: 4px;
+    }
+
+    .privacy-dropdown-arrow {
+      display: inline-block;
+      font-size: 0.75em;
+      transition: transform 0.2s ease;
+    }
+
+    .privacy-dropbtn[aria-expanded="true"] .privacy-dropdown-arrow {
+      transform: rotate(180deg);
+    }
+
+    .privacy-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 12px);
+      right: 0;
+      z-index: 1000;
+      min-width: 190px;
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      background: rgba(15, 15, 15, 0.98);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .privacy-dropdown-menu[hidden] {
+      display: none;
+    }
+
+    .privacy-dropdown-menu a {
+      display: block;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: #fff;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .privacy-dropdown-menu a:hover,
+    .privacy-dropdown-menu a:focus-visible {
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+    }
+
+    @media (max-width: 768px) {
+      .privacy-dropdown-menu {
+        right: auto;
+        left: 0;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="page-bg"></div>
 
-<nav class="nav">
-   <a class="brand" href="#home">KERAM</a>
+  <nav class="nav">
+    <a class="brand" href="#home">KERAM</a>
 
-  <div class="nav-links">
-    <a href="index.html">Home</a>
-  <div class="dropdown">
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="#manifest">Manifest</a>
+      <a href="#about">About</a>
+      <a href="#builder-hub">Builder Hub</a>
+      <a href="#buy">How to Buy</a>
+      <a href="#community">Community</a>
 
-    <a href="#manifest">Manifest</a>
-    <a href="#about">About</a>
-    <a href="#builder-hub">Builder Hub</a>
-    <a href="#buy">How to Buy</a>
-    <a href="#community">Community</a>
-    <a href="#" class="dropbtn">Privacy ▼</a>
+      <div class="privacy-dropdown" id="privacyDropdown">
+        <button
+          type="button"
+          class="privacy-dropbtn"
+          id="privacyDropdownButton"
+          aria-expanded="false"
+          aria-controls="privacyDropdownMenu"
+        >
+          Privacy
+          <span class="privacy-dropdown-arrow" aria-hidden="true">▼</span>
+        </button>
 
-</details>
-    
-  </div>
-</nav>
+        <div
+          class="privacy-dropdown-menu"
+          id="privacyDropdownMenu"
+          role="menu"
+          aria-labelledby="privacyDropdownButton"
+          hidden
+        >
+          <a href="/cookies" role="menuitem">Cookies</a>
+          <a href="/privacy" role="menuitem">Privacy Policy</a>
+          <a href="/terms" role="menuitem">Terms of Use</a>
+        </div>
+      </div>
+    </div>
+  </nav>
 
   <header id="home" class="hero">
     <div class="hero-glow"></div>
-    
+
     <p class="eyebrow">THE MEME COIN FOR THE PEOPLE WHO ACTUALLY BUILD THE WORLD.</p>
-<h1>WE ARE ALL <span>BUILDERS.</span></h1>
+    <h1>WE ARE ALL <span>BUILDERS.</span></h1>
     <p class="hero-text">
       Some build homes. Some build businesses. Some build families. Some build dreams.
       KERAM exists so builders can recognize one another.
     </p>
     <div class="hero-actions">
       <a class="btn btn-gold" href="#manifest">READ MANIFEST</a>
-          </div>
+    </div>
   </header>
 
   <main>
     <section id="manifest" class="section manifest">
-      <div class="section-title"><span></span><h2>WHY KERAM?</h2><span></span></div>
+      <div class="section-title">
+        <span></span>
+        <h2>WHY KERAM?</h2>
+        <span></span>
+      </div>
+
       <p class="manifest-text">
-  The world is built every day by people who rarely get the spotlight.<br>
-  The people who wake up early. The people who work with their hands.<br>
-  The people who create, repair, teach, care and keep going.<br><br>
+        The world is built every day by people who rarely get the spotlight.<br>
+        The people who wake up early. The people who work with their hands.<br>
+        The people who create, repair, teach, care and keep going.<br><br>
 
-  We are all builders in different ways, but always builders.<br><br>
+        We are all builders in different ways, but always builders.<br><br>
 
-  <strong>KERAM exists so builders can recognize one another.</strong><br><br>
+        <strong>KERAM exists so builders can recognize one another.</strong><br><br>
 
-  Build your dreams.<br>
-  Build your world.
-</p>
+        Build your dreams.<br>
+        Build your world.
+      </p>
 
-<div class="cards">
+      <div class="cards">
+        <article onclick="window.location.hash='builder-hub'" style="cursor: pointer;">
+          <div class="icon">🧱</div>
+          <div>
+            <h3>Build</h3>
+            <p>Homes, roads, rooms and foundations.</p>
+          </div>
+        </article>
 
-  <article onclick="window.location.hash='builder-hub'" style="cursor:pointer;">
-    <div class="icon">🧱</div>
-    <div>
-      <h3>Build</h3>
-      <p>Homes, roads, rooms and foundations.</p>
-    </div>
-  </article>
+        <article onclick="window.location.hash='builder-hub'" style="cursor: pointer;">
+          <div class="icon">🛠️</div>
+          <div>
+            <h3>Repair</h3>
+            <p>What is broken and deserves another chance.</p>
+          </div>
+        </article>
 
-  <article onclick="window.location.hash='builder-hub'" style="cursor:pointer;">
-    <div class="icon">🛠️</div>
-    <div>
-      <h3>Repair</h3>
-      <p>What is broken and deserves another chance.</p>
-    </div>
-  </article>
+        <article onclick="window.location.hash='builder-hub'" style="cursor: pointer;">
+          <div class="icon">💡</div>
+          <div>
+            <h3>Create</h3>
+            <p>Ideas, tools, art, businesses and futures.</p>
+          </div>
+        </article>
 
-  <article onclick="window.location.hash='builder-hub'" style="cursor:pointer;">
-    <div class="icon">💡</div>
-    <div>
-      <h3>Create</h3>
-      <p>Ideas, tools, art, businesses and futures.</p>
-    </div>
-  </article>
-
-  <article onclick="window.location.hash='builder-hub'" style="cursor:pointer;">
-    <div class="icon">❤️</div>
-    <div>
-      <h3>Care</h3>
-      <p>Families, communities and people around us.</p>
-    </div>
-  </article>
-
-</div>
+        <article onclick="window.location.hash='builder-hub'" style="cursor: pointer;">
+          <div class="icon">❤️</div>
+          <div>
+            <h3>Care</h3>
+            <p>Families, communities and people around us.</p>
+          </div>
+        </article>
+      </div>
     </section>
 
     <section id="builder-hub" class="section builder-hub">
-  <div class="glass builder-glass">
+      <div class="glass builder-glass">
+        <h2>Builder Hub</h2>
 
-    <h2>Builder Hub</h2>
+        <p class="builder-subtitle">
+          People. Conversations. Laughter. Mistakes. Persistence.
+        </p>
 
-    <p class="builder-subtitle">
-      People. Conversations. Laughter. Mistakes. Persistence.
-    </p>
+        <p class="builder-intro">
+          Where builders meet, share ideas, and recognize one another.
+        </p>
 
-    <p class="builder-intro">
-      Where builders meet, share ideas, and recognize one another.
-    </p>
+        <div class="hub-grid">
+          <div class="hub-card" id="meet-builders">
+            <h3>🤝 Meet Builders</h3>
+            <p>Introduce yourself. Tell us who you are, what you build, and where you're from.</p>
+            <a class="hub-link" href="#">Enter →</a>
+          </div>
 
-<div class="hub-grid">
+          <div class="hub-card" id="share-ideas">
+            <h3>💡 Share Ideas</h3>
+            <p>Every great project begins with one idea.</p>
+            <a class="hub-link" href="#">Enter →</a>
+          </div>
 
-  <div class="hub-card" id="meet-builders">
-    <h3>🤝 Meet Builders</h3>
-    <p>Introduce yourself. Tell us who you are, what you build, and where you're from.</p>
+          <div class="hub-card" id="help-others">
+            <h3>❤️ Help Others</h3>
+            <p>Builders grow stronger when they help each other.</p>
+            <a class="hub-link" href="#">Enter →</a>
+          </div>
 
-    <a class="hub-link" href="#">Enter →</a>
-  </div>
+          <div class="hub-card" id="community-hub">
+            <h3>🌍 Community</h3>
+            <p>Stories. Events. Humanitarian actions. Life.</p>
+            <a class="hub-link" href="#">Enter →</a>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <div class="hub-card" id="share-ideas">
-    <h3>💡 Share Ideas</h3>
-    <p>Every great project begins with one idea.</p>
-
-    <a class="hub-link" href="#">Enter →</a>
-  </div>
-
-  <div class="hub-card" id="help-others">
-    <h3>❤️ Help Others</h3>
-    <p>Builders grow stronger when they help each other.</p>
-
-    <a class="hub-link" href="#">Enter →</a>
-  </div>
-
-  <div class="hub-card" id="community-hub">
-    <h3>🌍 Community</h3>
-    <p>Stories. Events. Humanitarian actions. Life.</p>
-
-    <a class="hub-link" href="#">Enter →</a>
-  </div>
-
-</div>
-  </div>
-</section>
     <section id="about" class="section about">
-  <div>
-    <h2>Built by people.<br>United by purpose.</h2>
-  </div>
+      <div>
+        <h2>Built by people.<br>United by purpose.</h2>
+      </div>
 
-  <div class="glass">
-    <p>
-      KERAM is more than a meme coin. It is a community built on respect for the people who create, repair, improve and never give up.
-    </p>
+      <div class="glass">
+        <p>
+          KERAM is more than a meme coin. It is a community built on respect for the people who create, repair, improve and never give up.
+        </p>
 
-    <p>
-      We believe every person is building something — a home, a family, a business, a dream or a better future.
-    </p>
+        <p>
+          We believe every person is building something — a home, a family, a business, a dream or a better future.
+        </p>
 
-    <p>
-      KERAM is where builders recognize one another, regardless of profession, status or background.
-    </p>
-  </div>
-</section>
+        <p>
+          KERAM is where builders recognize one another, regardless of profession, status or background.
+        </p>
+      </div>
+    </section>
 
-  <section id="buy" class="section buy-section">
-  <div class="buy-card">
-    <p class="eyebrow">HOW TO BUY</p>
-    <h2>Start Building with KERAM</h2>
-    <p>
-  Buy KERAM safely on the Solana blockchain.<br>
-  Always use Phantom Wallet and verify the official token address before every swap.
-</p>
+    <section id="buy" class="section buy-section">
+      <div class="buy-card">
+        <p class="eyebrow">HOW TO BUY</p>
+        <h2>Start Building with KERAM</h2>
+        <p>
+          Buy KERAM safely on the Solana blockchain.<br>
+          Always use Phantom Wallet and verify the official token address before every swap.
+        </p>
 
-<div class="token-address">
-  <strong>Official Token Address</strong>
-<small>Copy this address before swapping.</small><br>
-  <code>FgWPMUkCmyFH9RZKo3PxLcj9DFTFfJcrBdXUoMkAJZjc</code>
-</div>
+        <div class="token-address">
+          <strong>Official Token Address</strong>
+          <small>Copy this address before swapping.</small><br>
+          <code>FgWPMUkCmyFH9RZKo3PxLcj9DFTFfJcrBdXUoMkAJZjc</code>
+        </div>
 
-  <div class="steps">
-    <div><strong>01</strong><span>Open Phantom wallet.</span></div>
-    <div><strong>02</strong><span>Prepare SOL for swap fees.</span></div>
-    <div><strong>03</strong><span>Use only the official KERAM token address.</span></div>
-  </div>
-</section>
-<section id="community" class="section community">
-  <p class="eyebrow">JOIN THE BUILDERS</p>
+        <div class="steps">
+          <div><strong>01</strong><span>Open Phantom wallet.</span></div>
+          <div><strong>02</strong><span>Prepare SOL for swap fees.</span></div>
+          <div><strong>03</strong><span>Use only the official KERAM token address.</span></div>
+        </div>
+      </div>
+    </section>
 
-  <h2>Build your dreams. Build your world.</h2>
+    <section id="community" class="section community">
+      <p class="eyebrow">JOIN THE BUILDERS</p>
 
- <p>
-  Join the KERAM community.<br>
-  Share your work. Share your ideas.<br>
-  Support people who build.<br><br>
+      <h2>Build your dreams. Build your world.</h2>
 
-  Together, we build more than projects.<br>
-  We build a community.
-</p>
+      <p>
+        Join the KERAM community.<br>
+        Share your work. Share your ideas.<br>
+        Support people who build.<br><br>
 
-  <div class="socials">
-    <a href="https://x.com/KeramHQ" target="_blank">X / Twitter</a>
-    <a href="https://t.me/+9owx4G6rLAg4ZjI0" target="_blank">Telegram</a>
-    <a href="https://www.facebook.com/share/16K5tGNSEq/" target="_blank">Facebook</a>
-  </div>
-</section>
-</main>
+        Together, we build more than projects.<br>
+        We build a community.
+      </p>
 
-<footer class="footer">
+      <div class="socials">
+        <a href="https://x.com/KeramHQ" target="_blank" rel="noopener noreferrer">X / Twitter</a>
+        <a href="https://t.me/+9owx4G6rLAg4ZjI0" target="_blank" rel="noopener noreferrer">Telegram</a>
+        <a href="https://www.facebook.com/share/16K5tGNSEq/" target="_blank" rel="noopener noreferrer">Facebook</a>
+      </div>
+    </section>
+  </main>
 
-  <div class="footer-left">
-    <strong>KERAM</strong><br>
-    <span>We are all builders.</span>
-  </div>
+  <footer class="footer">
+    <div class="footer-left">
+      <strong>KERAM</strong><br>
+      <span>We are all builders.</span>
+    </div>
 
-  <div class="footer-center">
-    © 2026 KERAM
-  </div>
+    <div class="footer-center">
+      © 2026 KERAM
+    </div>
 
-  <div class="footer-right">
-    <a href="https://x.com/KeramHQ" target="_blank">X</a>
-    <a href="https://t.me/+9owx4G6rLAg4ZjI0" target="_blank">Telegram</a>
-    <a href="https://www.facebook.com/share/16K5tGNSEq/" target="_blank">Facebook</a>
-  </div>
+    <div class="footer-right">
+      <a href="https://x.com/KeramHQ" target="_blank" rel="noopener noreferrer">X</a>
+      <a href="https://t.me/+9owx4G6rLAg4ZjI0" target="_blank" rel="noopener noreferrer">Telegram</a>
+      <a href="https://www.facebook.com/share/16K5tGNSEq/" target="_blank" rel="noopener noreferrer">Facebook</a>
+    </div>
+  </footer>
 
-</footer>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const dropdown = document.getElementById("privacyDropdown");
+      const button = document.getElementById("privacyDropdownButton");
+      const menu = document.getElementById("privacyDropdownMenu");
 
+      function closeDropdown(returnFocus) {
+        button.setAttribute("aria-expanded", "false");
+        menu.hidden = true;
+
+        if (returnFocus) {
+          button.focus();
+        }
+      }
+
+      button.addEventListener("click", function () {
+        const isOpen = button.getAttribute("aria-expanded") === "true";
+        button.setAttribute("aria-expanded", String(!isOpen));
+        menu.hidden = isOpen;
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!dropdown.contains(event.target)) {
+          closeDropdown(false);
+        }
+      });
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && !menu.hidden) {
+          closeDropdown(true);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
