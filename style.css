@@ -337,3 +337,117 @@ h2{font-size:clamp(2.2rem,4vw,3.4rem);line-height:1.05;color:var(--gold);letter-
     color:#ffffff;
     transform:translateX(6px);
 }
+/* ===== Privacy Dropdown ===== */
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropbtn {
+  background: transparent;
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  color: #f5f5f5;
+  padding: 10px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+  transition: all .25s ease;
+}
+
+.dropbtn:hover {
+  color: #f6c65b;
+  border-color: #f6c65b;
+  box-shadow: 0 0 14px rgba(246,198,91,.35);
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 220px;
+  background: rgba(8,14,24,.98);
+  border: 1px solid rgba(246,198,91,.35);
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.dropdown-content a {
+  display: block;
+  padding: 12px 16px;
+  color: #f5f5f5;
+  text-decoration: none;
+  transition: .2s;
+}
+
+.dropdown-content a:hover {
+  background: rgba(246,198,91,.12);
+  color: #f6c65b;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+/* ===== Privacy dropdown ===== */
+
+.privacy-menu{
+  position:relative;
+}
+
+.privacy-menu summary{
+  list-style:none;
+  cursor:pointer;
+  color:#fff;
+  font-weight:700;
+  padding:10px 18px;
+  border:1px solid rgba(244,201,93,.35);
+  border-radius:999px;
+  transition:.25s;
+}
+
+.privacy-menu summary::-webkit-details-marker{
+  display:none;
+}
+
+.privacy-menu summary::after{
+  content:" ▼";
+  color:#fff;
+  font-size:11px;
+}
+
+.privacy-menu[open] summary,
+.privacy-menu summary:hover{
+  color:#f4c95d;
+  border-color:#f4c95d;
+  box-shadow:0 0 14px rgba(244,201,93,.35);
+}
+
+.privacy-menu-content{
+  position:absolute;
+  top:calc(100% + 8px);
+  left:0;
+  min-width:220px;
+  padding:8px;
+  background:#08101c;
+  border:1px solid rgba(244,201,93,.35);
+  border-radius:12px;
+  z-index:1000;
+}
+
+.privacy-menu-content a{
+  display:block;
+  padding:12px 14px;
+  color:#fff;
+  font-weight:800;
+  font-size:14px;
+  text-decoration:none;
+  white-space:nowrap;
+}
+
+.privacy-menu-content a:hover{
+  color:#f4c95d;
+  background:rgba(244,201,93,.10);
+}
