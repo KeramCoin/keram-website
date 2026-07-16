@@ -168,7 +168,7 @@ async function loadMessages() {
 
             messageElement.appendChild(
                 document.createTextNode(
-                    displayedText
+                    `${message.username}: ${displayedText}`
                 )
             );
 
@@ -229,9 +229,9 @@ form.addEventListener(
                         "application/json"
                 },
                 body: JSON.stringify({
-                    text:
-                        `${username}: ${message}`,
-                    language
+                    text: message,
+                    language,
+                    username
                 })
             });
 
