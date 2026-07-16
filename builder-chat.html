@@ -30,13 +30,20 @@
 Talk. Laugh. Meet other builders.
 </p>
 
+<label for="language">
+My language:
+</label>
+
+<select id="language">
+    <option value="hr">Hrvatski</option>
+    <option value="en">English</option>
+</select>
+
 <div id="chat-window" class="chat-window">
-
-<div class="chat-message">
-<strong>System</strong><br>
-Welcome to Builder Chat.
-</div>
-
+    <div class="chat-message">
+        <strong>System</strong><br>
+        Loading Builder Chat...
+    </div>
 </div>
 
 <form id="chat-form" class="chat-form">
@@ -51,9 +58,13 @@ required>
 id="message"
 type="text"
 placeholder="Write a message..."
+autocomplete="off"
 required>
 
-<button class="btn btn-gold">
+<button
+id="send-button"
+class="btn btn-gold"
+type="submit">
 Send
 </button>
 
@@ -65,29 +76,191 @@ Send
 
 <script>
 
-const form=document.getElementById("chat-form");
-const windowBox=document.getElementById("chat-window");
+const form =
+    document.getElementById("chat-form");
 
-form.addEventListener("submit",function(e){
+const windowBox =
+    document.getElementById("chat-window");
 
-e.preventDefault();
+const usernameInput =
+    document.getElementById("username");
 
-const user=document.getElementById("username").value;
-const msg=document.getElementById("message").value;
+const messageInput =
+    document.getElementById("message");
 
-const div=document.createElement("div");
+const languageSelect =
+    document.getElementById("language");
 
-div.className="chat-message";
+const sendButton =
+    document.getElementById("send-button");
 
-div.innerHTML="<strong>"+user+"</strong><br>"+msg;
+let loadingMessages = false;
+let sendingMessage = false;
 
-windowBox.appendChild(div);
+async function loadMessages() {
 
-windowBox.scrollTop=windowBox.scrollHeight;
+    if (loadingMessages) {
+        return;
+    }
 
-document.getElementById("message").value="";
+    loadingMessages = true;
 
-});
+    try {
+
+        const language =
+            languageSelect.value;
+
+        const response = await fetch(
+            `/api/messages?language=${language}`
+        );
+
+        const data = await response.json();
+
+        windowBox.innerHTML = "";
+
+        if (data.messages.length === 0) {
+
+            const emptyMessage =
+                document.createElement("div");
+
+            emptyMessage.className =
+                "chat-message";
+
+            emptyMessage.textContent =
+                "No messages yet.";
+
+            windowBox.appendChild(
+                emptyMessage
+            );
+
+            return;
+
+        }
+
+        for (const message of data.messages) {
+
+            const messageElement =
+                document.createElement("div");
+
+            messageElement.className =
+                "chat-message";
+
+            const languageElement =
+                document.createElement("strong");
+
+            languageElement.textContent =
+                message.language.toUpperCase();
+
+            const displayedText =
+                message.language === language
+                    ? message.text
+                    : message.translations[
+                        language
+                    ] || message.text;
+
+            messageElement.appendChild(
+                languageElement
+            );
+
+            messageElement.appendChild(
+                document.createElement("br")
+            );
+
+            messageElement.appendChild(
+                document.createTextNode(
+                    displayedText
+                )
+            );
+
+            windowBox.appendChild(
+                messageElement
+            );
+
+        }
+
+        windowBox.scrollTop =
+            windowBox.scrollHeight;
+
+    } catch (error) {
+
+        windowBox.textContent =
+            "Builder Chat is currently unavailable.";
+
+    } finally {
+
+        loadingMessages = false;
+
+    }
+
+}
+
+form.addEventListener(
+    "submit",
+    async (event) => {
+
+        event.preventDefault();
+
+        if (sendingMessage) {
+            return;
+        }
+
+        const username =
+            usernameInput.value.trim();
+
+        const message =
+            messageInput.value.trim();
+
+        const language =
+            languageSelect.value;
+
+        if (!username || !message) {
+            return;
+        }
+
+        sendingMessage = true;
+        sendButton.disabled = true;
+
+        try {
+
+            await fetch("/api/messages", {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+                body: JSON.stringify({
+                    text:
+                        `${username}: ${message}`,
+                    language
+                })
+            });
+
+            messageInput.value = "";
+
+            await loadMessages();
+
+        } finally {
+
+            sendingMessage = false;
+            sendButton.disabled = false;
+            messageInput.focus();
+
+        }
+
+    }
+);
+
+languageSelect.addEventListener(
+    "change",
+    loadMessages
+);
+
+loadMessages();
+
+setInterval(
+    loadMessages,
+    1000
+);
 
 </script>
 
