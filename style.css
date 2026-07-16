@@ -717,3 +717,149 @@ line-height:1.6;
 color:#ddd;
 
 }
+
+/* ===== Builder Chat ===== */
+
+.chat-page{
+display:flex;
+align-items:center;
+justify-content:center;
+min-height:calc(100vh - 90px);
+padding-top:120px;
+padding-bottom:72px;
+}
+
+.chat-shell{
+width:min(900px,100%);
+min-height:0;
+padding:42px;
+border-radius:18px;
+box-shadow:0 24px 70px rgba(0,0,0,.35);
+}
+
+.chat-shell h1{
+color:#f4c95d;
+font-size:clamp(2.8rem,6vw,4.8rem);
+line-height:1;
+margin-bottom:12px;
+}
+
+.chat-shell .builder-subtitle{
+margin-bottom:30px;
+font-size:1.15rem;
+text-align:left;
+letter-spacing:.04em;
+}
+
+.chat-shell label{
+display:inline-block;
+margin-right:8px;
+color:#f4f4f4;
+font-weight:700;
+}
+
+.chat-shell select{
+padding:10px 14px;
+border:1px solid rgba(244,201,93,.4);
+border-radius:8px;
+background:#111722;
+color:#fff;
+font-size:1rem;
+cursor:pointer;
+}
+
+.chat-window{
+display:flex;
+flex-direction:column;
+gap:12px;
+min-height:300px;
+max-height:46vh;
+margin-top:22px;
+padding:20px;
+overflow-y:auto;
+border:1px solid rgba(244,201,93,.22);
+border-radius:14px;
+background:rgba(5,10,19,.82);
+}
+
+.chat-message{
+padding:14px 16px;
+overflow-wrap:anywhere;
+border-left:3px solid #f4c95d;
+border-radius:10px;
+background:#111722;
+color:#f5f5f5;
+line-height:1.5;
+}
+
+.chat-message strong{
+color:#f4c95d;
+}
+
+.chat-form{
+display:grid;
+grid-template-columns:minmax(140px,.7fr) minmax(260px,2fr) auto;
+gap:12px;
+margin-top:18px;
+align-items:stretch;
+}
+
+.chat-form input{
+width:100%;
+min-width:0;
+padding:14px 16px;
+border:1px solid rgba(244,201,93,.3);
+border-radius:10px;
+background:#111722;
+color:#fff;
+font-size:1rem;
+outline:none;
+}
+
+.chat-form input:focus{
+border-color:#f4c95d;
+box-shadow:0 0 0 3px rgba(244,201,93,.12);
+}
+
+.chat-form input::placeholder{
+color:#8d94a0;
+}
+
+.chat-form .btn{
+min-width:150px;
+padding:14px 22px;
+border:none;
+cursor:pointer;
+}
+
+.chat-form .btn:disabled{
+opacity:.6;
+cursor:not-allowed;
+transform:none;
+}
+
+@media (max-width:720px){
+
+.chat-page{
+padding-top:100px;
+padding-bottom:40px;
+}
+
+.chat-shell{
+padding:26px 20px;
+}
+
+.chat-window{
+min-height:280px;
+}
+
+.chat-form{
+grid-template-columns:1fr;
+}
+
+.chat-form .btn{
+width:100%;
+min-width:0;
+}
+
+}
