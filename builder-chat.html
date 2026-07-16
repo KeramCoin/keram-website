@@ -183,10 +183,37 @@ async function loadMessages() {
 
     } catch (error) {
 
-        windowBox.textContent =
-            "Builder Chat is currently unavailable.";
+    windowBox.innerHTML = `
+        <div class="chat-message">
+            <strong>KGCL Public Preview</strong><br>
+            Two builders. Two languages. One conversation.
+        </div>
 
-    } finally {
+        <div class="chat-message">
+            <strong>HR · Luka</strong><br>
+            Gradimo mjesto gdje jezik ne dijeli ljude.
+        </div>
+
+        <div class="chat-message">
+            <strong>EN · KGCL</strong><br>
+            We are building a place where language does not divide people.
+        </div>
+
+        <div class="chat-message">
+            <strong>Coming online soon</strong><br>
+            The working local AI prototype already translates Croatian and English.
+        </div>
+    `;
+
+    usernameInput.disabled = true;
+    messageInput.disabled = true;
+    sendButton.disabled = true;
+    sendButton.textContent = "Coming Soon";
+
+    messageInput.placeholder =
+        "Public KGCL launch coming soon...";
+
+} finally {
 
         loadingMessages = false;
 
