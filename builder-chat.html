@@ -164,11 +164,47 @@ async function loadMessages() {
             messageElement.className =
                 "chat-message";
 
+                        const metaElement =
+                document.createElement("div");
+
+            metaElement.className =
+                "chat-message-meta";
+
+            const usernameElement =
+                document.createElement("span");
+
+            usernameElement.className =
+                "chat-message-username";
+
+            usernameElement.textContent =
+                message.username;
+
             const languageElement =
-                document.createElement("strong");
+                document.createElement("span");
+
+            languageElement.className =
+                "chat-message-language";
+
+            const messageDate =
+                new Date(message.createdAt);
+
+            const formattedTime =
+                Number.isNaN(messageDate.getTime())
+                    ? ""
+                    : new Intl.DateTimeFormat(
+                        language === "hr"
+                            ? "hr-HR"
+                            : "en-GB",
+                        {
+                            dateStyle: "short",
+                            timeStyle: "short"
+                        }
+                    ).format(messageDate);
 
             languageElement.textContent =
-                message.language.toUpperCase();
+                formattedTime
+                    ? `${message.language.toUpperCase()} · ${formattedTime}`
+                    : message.language.toUpperCase();
 
             const displayedText =
                 message.language === language
@@ -177,17 +213,21 @@ async function loadMessages() {
                         language
                     ] || message.text;
 
-            messageElement.appendChild(
+            metaElement.appendChild(
+                usernameElement
+            );
+
+            metaElement.appendChild(
                 languageElement
             );
 
             messageElement.appendChild(
-                document.createElement("br")
+                metaElement
             );
 
             messageElement.appendChild(
                 document.createTextNode(
-                    `${message.username}: ${displayedText}`
+                    displayedText
                 )
             );
 

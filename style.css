@@ -796,6 +796,27 @@ line-height:1.5;
 color:#f4c95d;
 }
 
+.chat-message-meta{
+display:flex;
+align-items:center;
+justify-content:space-between;
+flex-wrap:wrap;
+gap:4px 12px;
+margin-bottom:4px;
+}
+
+.chat-message-username{
+color:#f5f5f5;
+font-weight:700;
+}
+
+.chat-message-language{
+color:#f4c95d;
+font-size:.82rem;
+font-weight:700;
+white-space:nowrap;
+}
+
 .chat-form{
 display:grid;
 grid-template-columns:minmax(140px,.7fr) minmax(260px,2fr) auto;
