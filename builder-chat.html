@@ -119,6 +119,22 @@ async function loadMessages() {
 
         const data = await response.json();
 
+        const latestMessageId = data.messages.reduce(
+            (latestId, message) =>
+                Math.max(
+                    latestId,
+                    Number(message.id) || 0
+                ),
+            0
+        );
+
+        if (latestMessageId > 0) {
+            localStorage.setItem(
+                "kgclLastReadMessageId",
+                String(latestMessageId)
+            );
+        }
+
         windowBox.innerHTML = "";
 
         if (data.messages.length === 0) {

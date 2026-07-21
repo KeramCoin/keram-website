@@ -863,3 +863,8 @@ min-width:0;
 }
 
 }
+
+.nav-links a.has-unread {
+  color: #d4af37;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.75);
+}

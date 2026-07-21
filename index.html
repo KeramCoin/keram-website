@@ -97,7 +97,7 @@
     <div class="nav-links">
       <a href="#manifest">Manifest</a>
       <a href="#about">About</a>
-      <a href="builder-chat.html">Builder Chat</a>
+      <a id="builder-chat-link" href="builder-chat.html">Builder Chat</a>
       <a href="#buy">How to Buy</a>
       <a href="#community">Community</a>
 
@@ -319,5 +319,71 @@ We believe that every person is building something — a home, a family, a busin
       });
     });
   </script>
+  <script>
+(() => {
+    const API_URL =
+        "https://kgcl-api.hqkeram.workers.dev";
+
+    const LAST_READ_KEY =
+        "kgclLastReadMessageId";
+
+    const chatLink =
+        document.getElementById(
+            "builder-chat-link"
+        );
+
+    async function checkUnreadMessages() {
+
+        if (!chatLink) {
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `${API_URL}/api/messages/latest`
+            );
+
+            if (!response.ok) {
+                return;
+            }
+
+            const data = await response.json();
+
+            const storedValue =
+                localStorage.getItem(
+                    LAST_READ_KEY
+                );
+
+            if (storedValue === null) {
+                localStorage.setItem(
+                    LAST_READ_KEY,
+                    String(data.latestMessageId)
+                );
+
+                return;
+            }
+
+            chatLink.classList.toggle(
+                "has-unread",
+                data.latestMessageId >
+                    Number(storedValue)
+            );
+
+        } catch (error) {
+            console.error(
+                "KGCL unread check failed:",
+                error
+            );
+        }
+    }
+
+    checkUnreadMessages();
+
+    setInterval(
+        checkUnreadMessages,
+        10000
+    );
+})();
+</script>
 </body>
 </html>
