@@ -70,6 +70,13 @@ Send
 
 </form>
 
+<p
+id="chat-status"
+class="chat-status"
+role="status"
+aria-live="polite">
+</p>
+
 </div>
 
 </section>
@@ -94,11 +101,15 @@ const languageSelect =
 const sendButton =
     document.getElementById("send-button");
 
+    const chatStatus =
+    document.getElementById("chat-status");
+
     const API_URL =
     "https://kgcl-api.hqkeram.workers.dev";
 
 let loadingMessages = false;
 let sendingMessage = false;
+let messageSendFailed = false;
 
 async function loadMessages() {
 
@@ -264,15 +275,12 @@ async function loadMessages() {
         </div>
     `;
 
-    usernameInput.disabled = true;
-    messageInput.disabled = true;
-    sendButton.disabled = true;
-    sendButton.textContent = "Coming Soon";
+                    if (!sendingMessage && !messageSendFailed) {
+            chatStatus.textContent =
+                "Messages could not be refreshed. Check your connection.";
+        }
 
-    messageInput.placeholder =
-        "Public KGCL launch coming soon...";
-
-} finally {
+    } finally {
 
         loadingMessages = false;
 
@@ -305,10 +313,14 @@ form.addEventListener(
 
         sendingMessage = true;
         sendButton.disabled = true;
+        messageSendFailed = false;
+
+        chatStatus.textContent =
+            "Sending message...";
 
         try {
 
-            await fetch(`${API_URL}/api/messages`, {
+            const response = await fetch(`${API_URL}/api/messages`, {
                 method: "POST",
                 headers: {
                     "Content-Type":
@@ -321,9 +333,29 @@ form.addEventListener(
                 })
             });
 
-            messageInput.value = "";
+            if (!response.ok) {
+                throw new Error(
+                    "Message was not accepted."
+                );
+            }
 
+            messageInput.value = "";
             await loadMessages();
+
+            chatStatus.textContent =
+                "Message sent.";
+
+        } catch (error) {
+
+            messageSendFailed = true;
+
+            console.error(
+                "Message sending failed:",
+                error
+            );
+
+            chatStatus.textContent =
+                "Message could not be sent. Please try again.";
 
         } finally {
 
