@@ -106,6 +106,56 @@ const sendButton =
 
     const API_URL =
     "https://kgcl-api.hqkeram.workers.dev";
+    const AUTHOR_KEY_STORAGE_KEY =
+    "kgclAuthorKey";
+
+function getAuthorKey() {
+    let authorKey =
+        localStorage.getItem(AUTHOR_KEY_STORAGE_KEY);
+
+    if (!authorKey) {
+        const randomBytes =
+            new Uint8Array(32);
+
+        crypto.getRandomValues(randomBytes);
+
+        authorKey = Array.from(randomBytes)
+            .map((byte) =>
+                byte.toString(16).padStart(2, "0")
+            )
+            .join("");
+
+        localStorage.setItem(
+            AUTHOR_KEY_STORAGE_KEY,
+            authorKey
+        );
+    }
+
+    return authorKey;
+}
+
+async function hashAuthorKey(value) {
+    const data =
+        new TextEncoder().encode(value);
+
+    const hash =
+        await crypto.subtle.digest(
+            "SHA-256",
+            data
+        );
+
+    return Array.from(
+        new Uint8Array(hash)
+    )
+        .map((byte) =>
+            byte.toString(16).padStart(2, "0")
+        )
+        .join("");
+}
+
+const authorKey = getAuthorKey();
+const authorKeyHashPromise =
+    hashAuthorKey(authorKey);
 
 let loadingMessages = false;
 let sendingMessage = false;
@@ -120,6 +170,9 @@ async function loadMessages() {
     loadingMessages = true;
 
     try {
+
+        const currentAuthorKeyHash =
+            await authorKeyHashPromise;
 
         const language =
             languageSelect.value;
@@ -223,6 +276,9 @@ async function loadMessages() {
                     : message.translations[
                         language
                     ] || message.text;
+                    const isOwnMessage =
+                    message.authorKeyHash ===
+                    currentAuthorKeyHash;
 
             metaElement.appendChild(
                 usernameElement
@@ -241,6 +297,82 @@ async function loadMessages() {
                     displayedText
                 )
             );
+
+            if (isOwnMessage) {
+    const editButton =
+        document.createElement("button");
+
+    editButton.type = "button";
+    editButton.className =
+        "chat-message-edit";
+
+    editButton.textContent = "Edit";
+
+    editButton.addEventListener(
+    "click",
+    async () => {
+        const editedText = window.prompt(
+            "Edit your message:",
+            message.text
+        );
+
+        if (editedText === null) {
+            return;
+        }
+
+        const newText = editedText.trim();
+
+        if (
+            !newText ||
+            newText === message.text
+        ) {
+            return;
+        }
+
+        editButton.disabled = true;
+        chatStatus.textContent =
+            "Updating message...";
+
+        try {
+            const response = await fetch(
+                `${API_URL}/api/messages/${message.id}`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify({
+                        text: newText,
+                        authorKey
+                    })
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    "Message could not be updated."
+                );
+            }
+
+            await loadMessages();
+
+            chatStatus.textContent =
+                "Message updated.";
+
+        } catch (error) {
+            chatStatus.textContent =
+                "Message could not be updated.";
+
+            editButton.disabled = false;
+        }
+    }
+);
+
+    messageElement.appendChild(
+        editButton
+    );
+}
 
             windowBox.appendChild(
                 messageElement
@@ -327,10 +459,11 @@ form.addEventListener(
                         "application/json"
                 },
                 body: JSON.stringify({
-                    text: message,
-                    language,
-                    username
-                })
+                text: message,
+                language,
+                username,
+                authorKey
+            })
             });
 
             if (!response.ok) {

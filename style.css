@@ -889,3 +889,25 @@ min-width:0;
   color: #d4af37;
   text-shadow: 0 0 8px rgba(212, 175, 55, 0.75);
 }
+
+.chat-message-edit{
+margin-left:12px;
+padding:3px 8px;
+border:1px solid rgba(244,201,93,.55);
+border-radius:6px;
+background:transparent;
+color:#f4c95d;
+font:inherit;
+font-size:.78rem;
+font-weight:700;
+cursor:pointer;
+}
+
+.chat-message-edit:hover{
+background:rgba(244,201,93,.12);
+}
+
+.chat-message-edit:disabled{
+opacity:.55;
+cursor:wait;
+}
