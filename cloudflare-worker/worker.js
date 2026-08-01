@@ -6,6 +6,7 @@ const LANGUAGES = new Set(["hr", "en", "ru", "it"]);
 const ORIGINS = new Set([
   "https://k3ram.com",
   "https://www.k3ram.com",
+  "https://localhost",
   "http://localhost:3000",
   "http://localhost:8000",
   "http://localhost:8080"
@@ -77,8 +78,11 @@ async function translateQuality(env, text, source, target) {
         role: "system",
         content:
           `Translate from ${languageNames[source]} to ${languageNames[target]}. ` +
-          "Return only the translated text. Preserve names, emojis, punctuation, " +
-          "meaning and tone. Do not explain. Do not mix languages."
+          "Return only the translated text. " +
+          "KERAM and KGCL are brand names. Never translate, inflect, transliterate, or alter them. " +
+          "Preserve every emoji exactly and in the same order. " +
+          "Preserve names, punctuation, meaning and tone. " +
+          "Do not explain. Do not mix languages."
       },
       {
         role: "user",
