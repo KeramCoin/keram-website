@@ -105,6 +105,16 @@ async function translateQuality(env, text, source, target) {
   return translatedText;
 }
 
+function extractEmojiSequence(value) {
+  const emojiPattern =
+    /(?:\p{Regional_Indicator}{2}|[#*0-9]\uFE0F?\u20E3|\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?(?:\p{Emoji_Modifier})?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?(?:\p{Emoji_Modifier})?)*)/gu;
+
+  return Array.from(
+    String(value).matchAll(emojiPattern),
+    match => match[0]
+  );
+}
+
 async function translateForChat(env, text, source, target) {
   try {
     const translatedText = await translateQuality(
@@ -115,23 +125,33 @@ async function translateForChat(env, text, source, target) {
     );
 
     const compactText = translatedText.replace(/\s/g, "");
-    const hasLettersOrNumbers =
-      /[\p{L}\p{N}]/u.test(translatedText);
-    const isRepetitive =
-      compactText.length > 20 &&
-      new Set(compactText).size <= 3;
-    const isTooLong =
-      translatedText.length > Math.max(text.length * 8, 300);
+const hasLettersOrNumbers =
+  /[\p{L}\p{N}]/u.test(translatedText);
+const isRepetitive =
+  compactText.length > 20 &&
+  new Set(compactText).size <= 3;
+const isTooLong =
+  translatedText.length > Math.max(text.length * 8, 300);
 
-    if (
-      !hasLettersOrNumbers ||
-      isRepetitive ||
-      isTooLong
-    ) {
-      throw new Error(
-        "Quality translation returned invalid text."
-      );
-    }
+const sourceEmojis = extractEmojiSequence(text);
+const translatedEmojis =
+  extractEmojiSequence(translatedText);
+const hasEmojiMismatch =
+  sourceEmojis.length !== translatedEmojis.length ||
+  sourceEmojis.some(
+    (emoji, index) => emoji !== translatedEmojis[index]
+  );
+
+if (
+  !hasLettersOrNumbers ||
+  isRepetitive ||
+  isTooLong ||
+  hasEmojiMismatch
+) {
+  throw new Error(
+    "Quality translation returned invalid text."
+  );
+}
 
     return translatedText;
   } catch (error) {
