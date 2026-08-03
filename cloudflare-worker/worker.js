@@ -20,7 +20,7 @@ function cors(request) {
       ? origin
       : "https://k3ram.com",
     "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type, X-Room-Code",
     "Vary": "Origin"
   };
 }
@@ -331,16 +331,186 @@ async function handleQualityTranslation(request, env) {
   });
 }
 
+function normalizeRoomCode(value) {
+  return String(value || "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "");
+}
+
+function generateRoomCode() {
+  const alphabet =
+    "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const randomBytes = new Uint8Array(10);
+
+  crypto.getRandomValues(randomBytes);
+
+  const code = Array.from(
+    randomBytes,
+    (byte) => alphabet[byte % alphabet.length]
+  ).join("");
+
+  return `${code.slice(0, 5)}-${code.slice(5)}`;
+}
+
+async function findRoomByCode(env, value) {
+  const normalizedCode = normalizeRoomCode(value);
+
+  if (normalizedCode.length !== 10) {
+    return null;
+  }
+
+  const codeHash =
+    await hashAuthorKey(normalizedCode);
+
+  return await env.DB.prepare(`
+    SELECT
+      id,
+      name,
+      owner_key_hash,
+      created_at
+    FROM rooms
+    WHERE code_hash = ?
+      AND active = 1
+    LIMIT 1
+  `).bind(codeHash).first();
+}
+
+async function resolveRoomAccess(request, env) {
+  const roomCode =
+    request.headers.get("X-Room-Code");
+
+  if (!roomCode) {
+    return {
+      room: null,
+      error: null
+    };
+  }
+
+  const room =
+    await findRoomByCode(env, roomCode);
+
+  if (!room) {
+    return {
+      room: null,
+      error: json(request, {
+        error: "Private room not found or code is invalid."
+      }, 403)
+    };
+  }
+
+  return {
+    room,
+    error: null
+  };
+}
+
+async function createRoom(request, env) {
+  const data = await request.json();
+  const name = String(data.name || "").trim();
+  const authorKey =
+    String(data.authorKey || "").trim();
+
+  if (!name || name.length > 80) {
+    return json(request, {
+      error: "Room name must contain 1 to 80 characters."
+    }, 400);
+  }
+
+  if (
+    !authorKey ||
+    authorKey.length < 32 ||
+    authorKey.length > 100
+  ) {
+    return json(request, {
+      error: "Valid author key is required."
+    }, 400);
+  }
+
+  const ownerKeyHash =
+    await hashAuthorKey(authorKey);
+  const createdAt = new Date().toISOString();
+
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const roomCode = generateRoomCode();
+    const normalizedCode =
+      normalizeRoomCode(roomCode);
+    const codeHash =
+      await hashAuthorKey(normalizedCode);
+
+    const result = await env.DB.prepare(`
+      INSERT OR IGNORE INTO rooms (
+        name,
+        code_hash,
+        owner_key_hash,
+        created_at
+      ) VALUES (?, ?, ?, ?)
+    `).bind(
+      name,
+      codeHash,
+      ownerKeyHash,
+      createdAt
+    ).run();
+
+    if (result.meta.changes > 0) {
+      return json(request, {
+        room: {
+          id: result.meta.last_row_id,
+          name,
+          code: roomCode,
+          createdAt
+        }
+      }, 201);
+    }
+  }
+
+  return json(request, {
+    error: "Private room could not be created."
+  }, 500);
+}
+
+async function joinRoom(request, env) {
+  const data = await request.json();
+  const roomCode =
+    String(data.code || "").trim();
+  const room =
+    await findRoomByCode(env, roomCode);
+
+  if (!room) {
+    return json(request, {
+      error: "Private room not found or code is invalid."
+    }, 403);
+  }
+
+  return json(request, {
+    room: {
+      id: room.id,
+      name: room.name,
+      code: roomCode,
+      createdAt: room.created_at
+    }
+  });
+}
+
 async function getMessages(request, env, url) {
   const language = String(
     url.searchParams.get("language") || "hr"
   ).toLowerCase();
 
-  if (!LANGUAGES.has(language)) {
+    if (!LANGUAGES.has(language)) {
     return json(request, {
-      error: "Supported languages are hr and en."
+      error: "Supported languages are hr, en, ru and it."
     }, 400);
   }
+
+  const roomAccess =
+    await resolveRoomAccess(request, env);
+
+  if (roomAccess.error) {
+    return roomAccess.error;
+  }
+
+  const room = roomAccess.room;
+  const roomId = room ? Number(room.id) : 0;
 
   const result = await env.DB.prepare(`
     SELECT * FROM (
@@ -355,16 +525,28 @@ async function getMessages(request, env, url) {
         translation_it,
         created_at,
         author_key_hash,
-        edited_at
-
+        edited_at,
+        room_id
       FROM messages
+      WHERE COALESCE(room_id, 0) = ?
       ORDER BY id DESC
       LIMIT 100
     )
     ORDER BY id ASC
-  `).run();
+   `).bind(roomId).run();
 
-  return json(request, {
+    return json(request, {
+    room: room
+      ? {
+          id: room.id,
+          name: room.name,
+          private: true
+        }
+      : {
+          id: null,
+          name: "Builder Chat",
+          private: false
+        },
     messages: result.results.map(toMessage)
   });
 }
@@ -394,12 +576,22 @@ if (!authorKey || authorKey.length < 32 || authorKey.length > 100) {
     }, 400);
   }
 
-  if (!LANGUAGES.has(language)) {
+    if (!LANGUAGES.has(language)) {
     return json(request, {
-      error: "Supported languages are hr and en."
+      error: "Supported languages are hr, en, ru and it."
     }, 400);
   }
-    const duplicateSince =
+
+  const roomAccess =
+    await resolveRoomAccess(request, env);
+
+  if (roomAccess.error) {
+    return roomAccess.error;
+  }
+
+  const room = roomAccess.room;
+  const roomId = room ? Number(room.id) : 0;
+  const duplicateSince =
     new Date(Date.now() - 10000).toISOString();
 
   const duplicateMessage = await env.DB.prepare(`
@@ -408,6 +600,7 @@ if (!authorKey || authorKey.length < 32 || authorKey.length > 100) {
     WHERE username = ?
       AND text = ?
       AND language = ?
+      AND COALESCE(room_id, 0) = ?
       AND created_at >= ?
     ORDER BY id DESC
     LIMIT 1
@@ -415,6 +608,7 @@ if (!authorKey || authorKey.length < 32 || authorKey.length > 100) {
     username,
     text,
     language,
+    roomId,
     duplicateSince
   ).first();
 
@@ -454,9 +648,11 @@ if (!authorKey || authorKey.length < 32 || authorKey.length > 100) {
       translation_en,
       translation_ru,
       translation_it,
-      created_at,
-      author_key_hash
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      createdAt,
+      authorKeyHash,
+      room ? room.id : null
+      room_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     username,
     text,
@@ -477,6 +673,7 @@ if (!authorKey || authorKey.length < 32 || authorKey.length > 100) {
       language,
       createdAt,
       authorKeyHash,
+      roomId: room ? room.id : null,
       translations
     }
   }, 201);
@@ -499,6 +696,18 @@ async function updateMessage(request, env, messageId) {
     }, 400);
   }
 
+    const roomAccess =
+    await resolveRoomAccess(request, env);
+
+  if (roomAccess.error) {
+    return roomAccess.error;
+  }
+
+  const room = roomAccess.room;
+  const requestedRoomId =
+    room ? Number(room.id) : 0;
+
+
   const existingMessage = await env.DB.prepare(`
     SELECT *
     FROM messages
@@ -508,6 +717,17 @@ async function updateMessage(request, env, messageId) {
   if (!existingMessage) {
     return json(request, {
       error: "Message not found."
+    }, 404);
+  }
+
+    const messageRoomId =
+    existingMessage.room_id
+      ? Number(existingMessage.room_id)
+      : 0;
+
+  if (messageRoomId !== requestedRoomId) {
+    return json(request, {
+      error: "Message not found in this room."
     }, 404);
   }
 
@@ -552,7 +772,8 @@ const translations = {
       translation_ru = ?,
       translation_it = ?,
       edited_at = ?
-    WHERE id = ?
+      WHERE id = ?
+        AND COALESCE(room_id, 0) = ?
   `).bind(
     text,
     translations.hr,
@@ -560,14 +781,19 @@ const translations = {
     translations.ru,
     translations.it,
     editedAt,
-    messageId
+    messageId,
+    requestedRoomId
   ).run();
 
   const updatedMessage = await env.DB.prepare(`
     SELECT *
     FROM messages
     WHERE id = ?
-  `).bind(messageId).first();
+    AND COALESCE(room_id, 0) = ?
+  `).bind(
+    messageId,
+    requestedRoomId
+  ).first();
 
   return json(request, {
     message: toMessage(updatedMessage)
@@ -578,6 +804,7 @@ async function getLatestMessage(request, env) {
   const latestMessage = await env.DB.prepare(`
     SELECT id
     FROM messages
+    WHERE room_id IS NULL
     ORDER BY id DESC
     LIMIT 1
   `).first();
@@ -627,7 +854,7 @@ export default {
 
         return json(request, {
           status: "ready",
-          table: "messages"
+          tables: ["messages", "rooms"]
         });
       }
 
@@ -644,6 +871,21 @@ export default {
       ) {
       return await handleQualityTranslation(request, env);
       }
+
+            if (
+        request.method === "POST" &&
+        url.pathname === "/api/rooms"
+      ) {
+        return await createRoom(request, env);
+      }
+
+      if (
+        request.method === "POST" &&
+        url.pathname === "/api/rooms/join"
+      ) {
+        return await joinRoom(request, env);
+      }
+
 
       if (
         request.method === "GET" &&
