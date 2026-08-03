@@ -6,7 +6,7 @@
 
 <title>Builder Chat | KERAM</title>
 
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=rooms-1">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
 
@@ -29,6 +29,48 @@
 <p class="builder-subtitle">
 Talk. Laugh. Meet other builders.
 </p>
+
+<div class="chat-room-panel">
+
+    <div class="chat-room-heading">
+        <span>Current room:</span>
+        <strong id="room-name">Builder Chat</strong>
+    </div>
+
+    <div class="chat-room-actions">
+        <button
+        id="public-room-button"
+        class="chat-room-button is-active"
+        type="button">
+        Public Chat
+        </button>
+
+        <button
+        id="create-room-button"
+        class="chat-room-button"
+        type="button">
+        Create Private Room
+        </button>
+
+        <button
+        id="join-room-button"
+        class="chat-room-button"
+        type="button">
+        Join Private Room
+        </button>
+    </div>
+
+    <p
+    id="room-status"
+    class="chat-room-status"
+    role="status"
+    aria-live="polite">
+    Public Builder Chat
+    </p>
+
+</div>
+
+<label for="language">
 
 <label for="language">
 My language:
@@ -111,6 +153,50 @@ const sendButton =
     const AUTHOR_KEY_STORAGE_KEY =
     "kgclAuthorKey";
 
+    const ACTIVE_ROOM_CODE_KEY =
+    "kgclActiveRoomCode";
+
+const ACTIVE_ROOM_NAME_KEY =
+    "kgclActiveRoomName";
+
+const roomNameElement =
+    document.getElementById("room-name");
+
+const roomStatus =
+    document.getElementById("room-status");
+
+const publicRoomButton =
+    document.getElementById("public-room-button");
+
+const createRoomButton =
+    document.getElementById("create-room-button");
+
+const joinRoomButton =
+    document.getElementById("join-room-button");
+
+let activeRoomCode =
+    localStorage.getItem(ACTIVE_ROOM_CODE_KEY) || "";
+
+let activeRoomName =
+    localStorage.getItem(ACTIVE_ROOM_NAME_KEY) ||
+    "Builder Chat";
+
+function roomHeaders(includeContentType = false) {
+    const headers = {};
+
+    if (includeContentType) {
+        headers["Content-Type"] =
+            "application/json";
+    }
+
+    if (activeRoomCode) {
+        headers["X-Room-Code"] =
+            activeRoomCode;
+    }
+
+    return headers;
+}
+
 function getAuthorKey() {
     let authorKey =
         localStorage.getItem(AUTHOR_KEY_STORAGE_KEY);
@@ -180,10 +266,47 @@ async function loadMessages() {
             languageSelect.value;
 
         const response = await fetch(
-            `${API_URL}/api/messages?language=${language}`
-        );
+    `${API_URL}/api/messages?language=${language}`,
+    {
+        headers: roomHeaders()
+    }
+);
 
-        const data = await response.json();
+const data = await response.json();
+
+if (!response.ok) {
+    throw new Error(
+        data.error || "Room could not be loaded."
+    );
+}
+
+const currentRoom = data.room || {
+    id: null,
+    name: "Builder Chat",
+    private: false
+};
+
+roomNameElement.textContent =
+    currentRoom.name;
+
+roomStatus.textContent =
+    currentRoom.private
+        ? `Private room — code: ${activeRoomCode}`
+        : "Public Builder Chat";
+
+publicRoomButton.classList.toggle(
+    "is-active",
+    !currentRoom.private
+);
+
+if (currentRoom.private) {
+    activeRoomName = currentRoom.name;
+
+    localStorage.setItem(
+        ACTIVE_ROOM_NAME_KEY,
+        activeRoomName
+    );
+}
 
         const latestMessageId = data.messages.reduce(
             (latestId, message) =>
@@ -340,10 +463,7 @@ async function loadMessages() {
                 `${API_URL}/api/messages/${message.id}`,
                 {
                     method: "PATCH",
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+                    headers: roomHeaders(true),
                     body: JSON.stringify({
                         text: newText,
                         authorKey
@@ -456,10 +576,7 @@ form.addEventListener(
 
             const response = await fetch(`${API_URL}/api/messages`, {
                 method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+                headers: roomHeaders(true),
                 body: JSON.stringify({
                 text: message,
                 language,
@@ -500,6 +617,194 @@ form.addEventListener(
 
         }
 
+    }
+);
+
+publicRoomButton.addEventListener(
+    "click",
+    async () => {
+        activeRoomCode = "";
+        activeRoomName = "Builder Chat";
+
+        localStorage.removeItem(
+            ACTIVE_ROOM_CODE_KEY
+        );
+
+        localStorage.removeItem(
+            ACTIVE_ROOM_NAME_KEY
+        );
+
+        roomNameElement.textContent =
+            "Builder Chat";
+
+        roomStatus.textContent =
+            "Public Builder Chat";
+
+        publicRoomButton.classList.add(
+            "is-active"
+        );
+
+        await loadMessages();
+    }
+);
+
+createRoomButton.addEventListener(
+    "click",
+    async () => {
+        const enteredName = prompt(
+            "Private room name:"
+        );
+
+        if (enteredName === null) {
+            return;
+        }
+
+        const roomName =
+            enteredName.trim();
+
+        if (!roomName) {
+            roomStatus.textContent =
+                "Enter a room name.";
+            return;
+        }
+
+        roomStatus.textContent =
+            "Creating private room…";
+
+        try {
+            const response = await fetch(
+                `${API_URL}/api/rooms`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify({
+                        name: roomName,
+                        authorKey
+                    })
+                }
+            );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error ||
+                    "Private room could not be created."
+                );
+            }
+
+            activeRoomCode =
+                data.room.code;
+
+            activeRoomName =
+                data.room.name;
+
+            localStorage.setItem(
+                ACTIVE_ROOM_CODE_KEY,
+                activeRoomCode
+            );
+
+            localStorage.setItem(
+                ACTIVE_ROOM_NAME_KEY,
+                activeRoomName
+            );
+
+            publicRoomButton.classList.remove(
+                "is-active"
+            );
+
+            await loadMessages();
+
+            roomStatus.textContent =
+                `Invite code: ${activeRoomCode}`;
+
+            alert(
+                `Private room created.\n\nInvite code: ${activeRoomCode}`
+            );
+
+        } catch (error) {
+            roomStatus.textContent =
+                error.message;
+        }
+    }
+);
+
+joinRoomButton.addEventListener(
+    "click",
+    async () => {
+        const enteredCode = prompt(
+            "Enter private room code:"
+        );
+
+        if (enteredCode === null) {
+            return;
+        }
+
+        const roomCode =
+            enteredCode.trim().toUpperCase();
+
+        if (!roomCode) {
+            roomStatus.textContent =
+                "Enter a valid room code.";
+            return;
+        }
+
+        roomStatus.textContent =
+            "Joining private room…";
+
+        try {
+            const response = await fetch(
+                `${API_URL}/api/rooms/join`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify({
+                        code: roomCode
+                    })
+                }
+            );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error ||
+                    "Private room could not be joined."
+                );
+            }
+
+            activeRoomCode = roomCode;
+            activeRoomName =
+                data.room.name;
+
+            localStorage.setItem(
+                ACTIVE_ROOM_CODE_KEY,
+                activeRoomCode
+            );
+
+            localStorage.setItem(
+                ACTIVE_ROOM_NAME_KEY,
+                activeRoomName
+            );
+
+            publicRoomButton.classList.remove(
+                "is-active"
+            );
+
+            await loadMessages();
+
+        } catch (error) {
+            roomStatus.textContent =
+                error.message;
+        }
     }
 );
 
