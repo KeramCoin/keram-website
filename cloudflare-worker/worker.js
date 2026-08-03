@@ -648,9 +648,8 @@ if (!authorKey || authorKey.length < 32 || authorKey.length > 100) {
       translation_en,
       translation_ru,
       translation_it,
-      createdAt,
-      authorKeyHash,
-      room ? room.id : null
+      created_at,
+      author_key_hash,
       room_id
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
@@ -662,7 +661,8 @@ if (!authorKey || authorKey.length < 32 || authorKey.length > 100) {
     translations.ru,
     translations.it,
     createdAt,
-    authorKeyHash
+    authorKeyHash,
+    room ? room.id : null
   ).run();
 
   return json(request, {
