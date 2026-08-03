@@ -177,10 +177,22 @@ async function setupDatabase(env) {
       translation_en TEXT,
       created_at TEXT NOT NULL,
       author_key_hash TEXT,
-      edited_at TEXT
-
+      edited_at TEXT,
+      room_id INTEGER
     )
   `).run();
+
+    await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS rooms (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      code_hash TEXT NOT NULL UNIQUE,
+      owner_key_hash TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      active INTEGER NOT NULL DEFAULT 1
+    )
+  `).run();
+
 
   const columns = await env.DB.prepare(`
     PRAGMA table_info(messages)
@@ -201,6 +213,13 @@ async function setupDatabase(env) {
     await env.DB.prepare(`
       ALTER TABLE messages
       ADD COLUMN edited_at TEXT
+    `).run();
+  }
+
+    if (!columnNames.has("room_id")) {
+    await env.DB.prepare(`
+      ALTER TABLE messages
+      ADD COLUMN room_id INTEGER
     `).run();
   }
 
@@ -228,6 +247,7 @@ function toMessage(row) {
     createdAt: row.created_at,
     authorKeyHash: row.author_key_hash,
     editedAt: row.edited_at,
+    roomId: row.room_id,
     translations: {
       hr: row.translation_hr,
       en: row.translation_en,
