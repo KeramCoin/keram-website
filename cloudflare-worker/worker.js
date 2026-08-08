@@ -814,6 +814,13 @@ async function getLatestMessage(request, env) {
       latestMessage?.id || 0
   });
 }
+async function getAppUpdate(request) {
+  return json(request, {
+    version: "1.1.0",
+    apkUrl:
+      "https://k3ram.com/downloads/kgcl-1.1.0.apk"
+  });
+}
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -844,6 +851,13 @@ export default {
         url.pathname === "/api/messages/latest"
       ) {
         return await getLatestMessage(request, env);
+      }
+
+      if (
+        request.method === "GET" &&
+        url.pathname === "/api/app-update"
+      ) {
+        return await getAppUpdate(request);
       }
 
       if (
