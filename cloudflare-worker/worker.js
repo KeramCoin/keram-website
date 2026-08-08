@@ -881,28 +881,36 @@ async function getMessages(request, env, url) {
   const room = roomAccess.room;
   const roomId = room ? Number(room.id) : 0;
 
-  const result = await env.DB.prepare(`
-    SELECT * FROM (
-      SELECT
-        id,
-        username,
-        text,
-        language,
-        translation_hr,
-        translation_en,
-        translation_ru,
-        translation_it,
-        created_at,
-        author_key_hash,
-        edited_at,
-        room_id
-      FROM messages
-      WHERE COALESCE(room_id, 0) = ?
-      ORDER BY id DESC
-      LIMIT 100
-    )
-    ORDER BY id ASC
-   `).bind(roomId).run();
+  const publicChatCutoff =
+  new Date(Date.now() - 5 * 60 * 1000).toISOString();
+
+const result = await env.DB.prepare(`
+  SELECT * FROM (
+    SELECT
+      id,
+      username,
+      text,
+      language,
+      translation_hr,
+      translation_en,
+      translation_ru,
+      translation_it,
+      created_at,
+      author_key_hash,
+      edited_at,
+      room_id
+    FROM messages
+    WHERE COALESCE(room_id, 0) = ?
+      AND (? = 1 OR created_at >= ?)
+    ORDER BY id DESC
+    LIMIT 100
+  )
+  ORDER BY id ASC
+`).bind(
+  roomId,
+  room ? 1 : 0,
+  publicChatCutoff
+).run();
 
     return json(request, {
     room: room
