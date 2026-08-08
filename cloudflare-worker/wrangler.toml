@@ -1,0 +1,11 @@
+name = "kgcl-api"
+main = "worker.js"
+compatibility_date = "2026-08-08"
+
+[ai]
+binding = "AI"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "kgcl-chat-db"
+database_id = "1459fd5b-e6d9-4511-a2dc-3a622d56af69"

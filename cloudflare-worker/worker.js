@@ -816,9 +816,9 @@ async function getLatestMessage(request, env) {
 }
 async function getAppUpdate(request) {
   return json(request, {
-    version: "1.1.0",
+    version: "1.1.1",
     apkUrl:
-      "https://k3ram.com/downloads/kgcl-1.1.0.apk"
+  "https://k3ram.com/downloads/kgcl-1.1.1.apk"
   });
 }
 export default {
