@@ -44,6 +44,73 @@ async function hashAuthorKey(authorKey) {
     .join("");
 }
 
+function bytesToHex(bytes) {
+  return Array.from(bytes)
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function hexToBytes(value) {
+  const bytes = new Uint8Array(value.length / 2);
+
+  for (let index = 0; index < bytes.length; index += 1) {
+    bytes[index] = parseInt(
+      value.slice(index * 2, index * 2 + 2),
+      16
+    );
+  }
+
+  return bytes;
+}
+
+function createSecureValue(byteLength = 32) {
+  const bytes = new Uint8Array(byteLength);
+
+  crypto.getRandomValues(bytes);
+
+  return bytesToHex(bytes);
+}
+
+async function hashPassword(password, salt) {
+  const passwordKey = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
+
+  const hash = await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      hash: "SHA-256",
+      salt: hexToBytes(salt),
+      iterations: 210000
+    },
+    passwordKey,
+    256
+  );
+
+  return bytesToHex(new Uint8Array(hash));
+}
+
+function valuesMatch(firstValue, secondValue) {
+  if (firstValue.length !== secondValue.length) {
+    return false;
+  }
+
+  let difference = 0;
+
+  for (let index = 0; index < firstValue.length; index += 1) {
+    difference |=
+      firstValue.charCodeAt(index) ^
+      secondValue.charCodeAt(index);
+  }
+
+  return difference === 0;
+}
+
+
 async function translate(env, text, source, target) {
   if (source === target) return text;
 
@@ -192,6 +259,30 @@ async function setupDatabase(env) {
       active INTEGER NOT NULL DEFAULT 1
     )
   `).run();
+
+    await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS accounts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT NOT NULL COLLATE NOCASE UNIQUE,
+      display_name TEXT NOT NULL,
+      email TEXT NOT NULL COLLATE NOCASE UNIQUE,
+      password_hash TEXT NOT NULL,
+      password_salt TEXT NOT NULL,
+      preferred_language TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    )
+  `).run();
+
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS account_sessions (
+      token_hash TEXT PRIMARY KEY,
+      account_id INTEGER NOT NULL,
+      created_at TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      FOREIGN KEY (account_id) REFERENCES accounts(id)
+    )
+  `).run();
+
 
 
   const columns = await env.DB.prepare(`
@@ -403,6 +494,158 @@ async function resolveRoomAccess(request, env) {
     error: null
   };
 }
+
+async function createAccountSession(env, accountId) {
+  const token = createSecureValue();
+  const tokenHash = await hashAuthorKey(token);
+  const createdAt = new Date().toISOString();
+  const expiresAt = new Date(
+    Date.now() + 30 * 24 * 60 * 60 * 1000
+  ).toISOString();
+
+  await env.DB.prepare(`
+    INSERT INTO account_sessions (
+      token_hash,
+      account_id,
+      created_at,
+      expires_at
+    )
+    VALUES (?, ?, ?, ?)
+  `).bind(
+    tokenHash,
+    accountId,
+    createdAt,
+    expiresAt
+  ).run();
+
+  return {
+    token,
+    expiresAt
+  };
+}
+
+async function registerAccount(request, env) {
+  const data = await request.json();
+
+  const username = String(
+    data.username || ""
+  ).trim();
+
+  const displayName = String(
+    data.displayName || ""
+  ).trim();
+
+  const email = String(
+    data.email || ""
+  ).trim().toLowerCase();
+
+  const password = String(
+    data.password || ""
+  );
+
+  const preferredLanguage = String(
+    data.preferredLanguage || ""
+  ).trim().toLowerCase();
+
+  if (!/^[a-zA-Z0-9._-]{3,30}$/.test(username)) {
+    return json(request, {
+      error:
+        "Username must contain 3–30 letters, numbers, dots, hyphens or underscores."
+    }, 400);
+  }
+
+  if (!displayName || displayName.length > 40) {
+    return json(request, {
+      error:
+        "Display name must contain 1–40 characters."
+    }, 400);
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return json(request, {
+      error: "Enter a valid email address."
+    }, 400);
+  }
+
+  if (password.length < 8 || password.length > 128) {
+    return json(request, {
+      error:
+        "Password must contain 8–128 characters."
+    }, 400);
+  }
+
+  if (!LANGUAGES.has(preferredLanguage)) {
+    return json(request, {
+      error: "Choose a supported preferred language."
+    }, 400);
+  }
+
+  const passwordSalt = createSecureValue(16);
+  const passwordHash = await hashPassword(
+    password,
+    passwordSalt
+  );
+  const createdAt = new Date().toISOString();
+
+  try {
+    const result = await env.DB.prepare(`
+      INSERT INTO accounts (
+        username,
+        display_name,
+        email,
+        password_hash,
+        password_salt,
+        preferred_language,
+        created_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      username,
+      displayName,
+      email,
+      passwordHash,
+      passwordSalt,
+      preferredLanguage,
+      createdAt
+    ).run();
+
+    const accountId = Number(
+      result.meta.last_row_id
+    );
+
+    const session = await createAccountSession(
+      env,
+      accountId
+    );
+
+    return json(request, {
+      account: {
+        id: accountId,
+        username,
+        displayName,
+        email,
+        preferredLanguage,
+        createdAt
+      },
+      sessionToken: session.token,
+      sessionExpiresAt: session.expiresAt
+    }, 201);
+  } catch (error) {
+    if (
+      String(error.message).includes(
+        "UNIQUE constraint failed"
+      )
+    ) {
+      return json(request, {
+        error:
+          "That username or email is already in use."
+      }, 409);
+    }
+
+    throw error;
+  }
+}
+
 
 async function createRoom(request, env) {
   const data = await request.json();
@@ -860,6 +1103,14 @@ export default {
         return await getAppUpdate(request);
       }
 
+            if (
+        request.method === "POST" &&
+        url.pathname === "/api/accounts/register"
+      ) {
+        return await registerAccount(request, env);
+      }
+
+
       if (
         request.method === "POST" &&
         url.pathname === "/setup"
@@ -868,7 +1119,12 @@ export default {
 
         return json(request, {
           status: "ready",
-          tables: ["messages", "rooms"]
+          tables: [
+            "messages",
+            "rooms",
+            "accounts",
+            "account_sessions"
+        ]
         });
       }
 
