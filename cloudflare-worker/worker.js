@@ -20,7 +20,8 @@ function cors(request) {
       ? origin
       : "https://k3ram.com",
     "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, X-Room-Code",
+    "Access-Control-Allow-Headers":
+    "Content-Type, X-Room-Code, Authorization",
     "Vary": "Origin"
   };
 }
@@ -646,6 +647,131 @@ async function registerAccount(request, env) {
   }
 }
 
+function accountResponse(account) {
+  return {
+    id: Number(account.id),
+    username: account.username,
+    displayName: account.display_name,
+    email: account.email,
+    preferredLanguage: account.preferred_language,
+    createdAt: account.created_at
+  };
+}
+
+async function getAccountFromSession(request, env) {
+  const authorization =
+    request.headers.get("Authorization") || "";
+
+  if (!authorization.startsWith("Bearer ")) {
+    return null;
+  }
+
+  const token = authorization
+    .slice("Bearer ".length)
+    .trim();
+
+  if (!token) {
+    return null;
+  }
+
+  const tokenHash = await hashAuthorKey(token);
+
+  return await env.DB.prepare(`
+    SELECT
+      accounts.id,
+      accounts.username,
+      accounts.display_name,
+      accounts.email,
+      accounts.preferred_language,
+      accounts.created_at
+    FROM account_sessions
+    INNER JOIN accounts
+      ON accounts.id = account_sessions.account_id
+    WHERE account_sessions.token_hash = ?
+      AND account_sessions.expires_at > ?
+    LIMIT 1
+  `).bind(
+    tokenHash,
+    new Date().toISOString()
+  ).first();
+}
+
+async function loginAccount(request, env) {
+  const data = await request.json();
+
+  const email = String(
+    data.email || ""
+  ).trim().toLowerCase();
+
+  const password = String(
+    data.password || ""
+  );
+
+  if (!email || !password) {
+    return json(request, {
+      error: "Enter your email and password."
+    }, 400);
+  }
+
+  const account = await env.DB.prepare(`
+    SELECT *
+    FROM accounts
+    WHERE email = ?
+    LIMIT 1
+  `).bind(email).first();
+
+  if (!account) {
+    return json(request, {
+      error: "Email or password is incorrect."
+    }, 401);
+  }
+
+  const passwordHash = await hashPassword(
+    password,
+    account.password_salt
+  );
+
+  if (
+    !valuesMatch(
+      passwordHash,
+      account.password_hash
+    )
+  ) {
+    return json(request, {
+      error: "Email or password is incorrect."
+    }, 401);
+  }
+
+  const session = await createAccountSession(
+    env,
+    Number(account.id)
+  );
+
+  return json(request, {
+    account: accountResponse(account),
+    sessionToken: session.token,
+    sessionExpiresAt: session.expiresAt
+  });
+}
+
+async function getCurrentAccount(request, env) {
+  const account = await getAccountFromSession(
+    request,
+    env
+  );
+
+  if (!account) {
+    return json(request, {
+      error: "Sign in is required."
+    }, 401);
+  }
+
+  return json(request, {
+    account: accountResponse(account)
+  });
+}
+
+
 
 async function createRoom(request, env) {
   const data = await request.json();
@@ -1108,6 +1234,20 @@ export default {
         url.pathname === "/api/accounts/register"
       ) {
         return await registerAccount(request, env);
+      }
+
+            if (
+        request.method === "POST" &&
+        url.pathname === "/api/accounts/login"
+      ) {
+        return await loginAccount(request, env);
+      }
+
+      if (
+        request.method === "GET" &&
+        url.pathname === "/api/accounts/me"
+      ) {
+        return await getCurrentAccount(request, env);
       }
 
 
