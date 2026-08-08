@@ -595,11 +595,19 @@ form.addEventListener(
                 );
             }
 
-            messageInput.value = "";
-            await loadMessages();
+                messageInput.value = "";
 
-            chatStatus.textContent =
-                "Message sent.";
+    try {
+        await loadMessages();
+    } catch (error) {
+        console.error(
+            "Message refresh failed:",
+            error
+        );
+    }
+
+    chatStatus.textContent =
+        "Message sent.";
 
         } catch (error) {
 
