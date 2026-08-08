@@ -248,6 +248,7 @@ const authorKeyHashPromise =
 let loadingMessages = false;
 let sendingMessage = false;
 let messageSendFailed = false;
+let initialMessagesLoaded = false;
 
 async function loadMessages() {
 
@@ -502,9 +503,12 @@ if (currentRoom.private) {
 
         }
 
-        windowBox.scrollTop =
-            windowBox.scrollHeight;
+       if (!initialMessagesLoaded) {
+    windowBox.scrollTop =
+        windowBox.scrollHeight;
 
+    initialMessagesLoaded = true;
+}
     } catch (error) {
 
     windowBox.innerHTML = `
