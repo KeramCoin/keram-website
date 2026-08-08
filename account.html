@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+  <title>KERAM Account</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link
+    rel="icon"
+    type="image/png"
+    href="assets/favicon.png"
+  >
+</head>
+<body>
+  <div class="page-bg"></div>
+
+  <nav class="nav">
+    <a class="brand" href="index.html">KERAM</a>
+
+    <div class="nav-links">
+      <a href="index.html">← Back to Home</a>
+    </div>
+  </nav>
+
+  <section class="section account-page">
+    <div class="glass account-card">
+      <p class="eyebrow">KERAM ACCOUNT</p>
+
+      <h1>Build your place in KERAM.</h1>
+
+      <p class="builder-subtitle">
+        One simple account for the KERAM community.
+      </p>
+
+      <div id="account-guest">
+        <form id="register-form" class="account-form">
+          <label for="register-username">
+            Username / display name
+          </label>
+
+          <input
+            id="register-username"
+            type="text"
+            autocomplete="username"
+            maxlength="30"
+            placeholder="Choose your KERAM name"
+            required
+          >
+
+          <label for="register-email">Email</label>
+
+          <input
+            id="register-email"
+            type="email"
+            autocomplete="email"
+            placeholder="you@example.com"
+            required
+          >
+
+          <label for="register-password">Password</label>
+
+          <input
+            id="register-password"
+            type="password"
+            autocomplete="new-password"
+            minlength="8"
+            maxlength="128"
+            placeholder="At least 8 characters"
+            required
+          >
+
+          <label for="register-language">
+            Preferred language
+          </label>
+
+          <select id="register-language" required>
+            <option value="hr">Hrvatski</option>
+            <option value="en">English</option>
+            <option value="ru">Русский</option>
+            <option value="it">Italiano</option>
+          </select>
+
+          <button class="btn btn-gold" type="submit">
+            Create my KERAM account
+          </button>
+        </form>
+
+        <p class="account-switch">
+          Already have an account?
+          <button
+            id="show-login-button"
+            class="account-text-button"
+            type="button"
+          >
+            Sign in
+          </button>
+        </p>
+
+        <form
+          id="login-form"
+          class="account-form"
+          hidden
+        >
+          <label for="login-email">Email</label>
+
+          <input
+            id="login-email"
+            type="email"
+            autocomplete="email"
+            required
+          >
+
+          <label for="login-password">Password</label>
+
+          <input
+            id="login-password"
+            type="password"
+            autocomplete="current-password"
+            required
+          >
+
+          <button class="btn btn-gold" type="submit">
+            Sign in to KERAM
+          </button>
+        </form>
+      </div>
+
+      <div id="account-member" hidden>
+        <p class="account-welcome">
+          Welcome, <strong id="account-name"></strong>.
+        </p>
+
+        <p id="account-details" class="account-details"></p>
+      </div>
+
+      <p
+        id="account-status"
+        class="account-status"
+        role="status"
+        aria-live="polite"
+      ></p>
+    </div>
+  </section>
+
+  <script>
+    const API_URL =
+      "https://kgcl-api.hqkeram.workers.dev";
+
+    const ACCOUNT_STORAGE_KEY =
+      "keramAccountSession";
+
+    const guestElement =
+      document.getElementById("account-guest");
+
+    const memberElement =
+      document.getElementById("account-member");
+
+    const accountNameElement =
+      document.getElementById("account-name");
+
+    const accountDetailsElement =
+      document.getElementById("account-details");
+
+    const accountStatus =
+      document.getElementById("account-status");
+
+    const registerForm =
+      document.getElementById("register-form");
+
+    const loginForm =
+      document.getElementById("login-form");
+
+    const showLoginButton =
+      document.getElementById("show-login-button");
+
+    function getStoredSession() {
+      try {
+        return JSON.parse(
+          localStorage.getItem(
+            ACCOUNT_STORAGE_KEY
+          ) || "null"
+        );
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function saveSession(session) {
+      localStorage.setItem(
+        ACCOUNT_STORAGE_KEY,
+        JSON.stringify(session)
+      );
+    }
+
+    function showAccount(account) {
+      guestElement.hidden = true;
+      memberElement.hidden = false;
+
+      accountNameElement.textContent =
+        account.displayName;
+
+      accountDetailsElement.textContent =
+        `@${account.username} · ${account.preferredLanguage.toUpperCase()}`;
+    }
+
+    function showGuest() {
+      guestElement.hidden = false;
+      memberElement.hidden = true;
+    }
+
+    async function requestAccount(path, body) {
+      const response = await fetch(
+        `${API_URL}${path}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "KERAM account request failed."
+        );
+      }
+
+      return data;
+    }
+
+    async function restoreSession() {
+      const session = getStoredSession();
+
+      if (!session || !session.token) {
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${API_URL}/api/accounts/me`,
+          {
+            headers: {
+              Authorization:
+                `Bearer ${session.token}`
+            }
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error();
+        }
+
+        const data = await response.json();
+
+        showAccount(data.account);
+      } catch (error) {
+        localStorage.removeItem(
+          ACCOUNT_STORAGE_KEY
+        );
+
+        showGuest();
+      }
+    }
+
+    registerForm.addEventListener(
+      "submit",
+      async (event) => {
+        event.preventDefault();
+
+        const username =
+          document.getElementById(
+            "register-username"
+          ).value.trim();
+
+        const email =
+          document.getElementById(
+            "register-email"
+          ).value.trim();
+
+        const password =
+          document.getElementById(
+            "register-password"
+          ).value;
+
+        const preferredLanguage =
+          document.getElementById(
+            "register-language"
+          ).value;
+
+        accountStatus.textContent =
+          "Creating your KERAM account…";
+
+        try {
+          const data = await requestAccount(
+            "/api/accounts/register",
+            {
+              username,
+              displayName: username,
+              email,
+              password,
+              preferredLanguage
+            }
+          );
+
+          saveSession({
+            token: data.sessionToken,
+            expiresAt: data.sessionExpiresAt
+          });
+
+          showAccount(data.account);
+
+          accountStatus.textContent =
+            "Your KERAM account is ready.";
+        } catch (error) {
+          accountStatus.textContent =
+            error.message;
+        }
+      }
+    );
+
+    showLoginButton.addEventListener(
+      "click",
+      () => {
+        loginForm.hidden = !loginForm.hidden;
+      }
+    );
+
+    loginForm.addEventListener(
+      "submit",
+      async (event) => {
+        event.preventDefault();
+
+        const email =
+          document.getElementById(
+            "login-email"
+          ).value.trim();
+
+        const password =
+          document.getElementById(
+            "login-password"
+          ).value;
+
+        accountStatus.textContent =
+          "Signing in…";
+
+        try {
+          const data = await requestAccount(
+            "/api/accounts/login",
+            {
+              email,
+              password
+            }
+          );
+
+          saveSession({
+            token: data.sessionToken,
+            expiresAt: data.sessionExpiresAt
+          });
+
+          showAccount(data.account);
+
+          accountStatus.textContent =
+            "Signed in to KERAM.";
+        } catch (error) {
+          accountStatus.textContent =
+            error.message;
+        }
+      }
+    );
+
+    restoreSession();
+  </script>
+</body>
+</html>

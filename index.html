@@ -92,9 +92,15 @@
   <div class="page-bg"></div>
 
   <nav class="nav">
-    <a class="brand" href="#home">KERAM</a>
+    <div class="nav-identity">
+  <a class="brand" href="#home">KERAM</a>
 
-    <div class="nav-links">
+  <a id="account-link" href="account.html">
+    Create account
+  </a>
+</div>
+
+<div class="nav-links">
       <a href="#manifest">Manifest</a>
       <a href="#about">About</a>
       <a id="builder-chat-link" href="builder-chat.html">Builder Chat</a>
@@ -383,6 +389,71 @@ We believe that every person is building something — a home, a family, a busin
         checkUnreadMessages,
         10000
     );
+})();
+</script>
+<script>
+(() => {
+  const API_URL =
+    "https://kgcl-api.hqkeram.workers.dev";
+
+  const ACCOUNT_STORAGE_KEY =
+    "keramAccountSession";
+
+  const accountLink =
+    document.getElementById("account-link");
+
+  async function refreshAccountLink() {
+    if (!accountLink) {
+      return;
+    }
+
+    let session = null;
+
+    try {
+      session = JSON.parse(
+        localStorage.getItem(
+          ACCOUNT_STORAGE_KEY
+        ) || "null"
+      );
+    } catch (error) {
+      return;
+    }
+
+    if (!session || !session.token) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/accounts/me`,
+        {
+          headers: {
+            Authorization:
+              `Bearer ${session.token}`
+          }
+        }
+      );
+
+      if (!response.ok) {
+        localStorage.removeItem(
+          ACCOUNT_STORAGE_KEY
+        );
+
+        return;
+      }
+
+      const data = await response.json();
+
+      accountLink.textContent =
+        `@${data.account.username}`;
+    } catch (error) {
+      console.info(
+        "KERAM account status unavailable."
+      );
+    }
+  }
+
+  refreshAccountLink();
 })();
 </script>
 </body>
