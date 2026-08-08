@@ -160,7 +160,7 @@ async function translateQuality(env, text, source, target) {
     temperature: 0
   });
 
-  const translatedText = String(
+  let translatedText = String(
     result.response || ""
   ).trim();
 
@@ -168,6 +168,17 @@ async function translateQuality(env, text, source, target) {
     throw new Error(
       "Quality translation model returned no text."
     );
+  }
+
+  const sourceEmojis = extractEmojiSequence(text);
+  const translatedEmojis =
+    extractEmojiSequence(translatedText);
+
+  if (
+    sourceEmojis.length === 0 &&
+    translatedEmojis.length > 0
+  ) {
+    translatedText = removeEmojiSequence(translatedText);
   }
 
   return translatedText;
@@ -181,6 +192,16 @@ function extractEmojiSequence(value) {
     String(value).matchAll(emojiPattern),
     match => match[0]
   );
+}
+
+function removeEmojiSequence(value) {
+  const emojiPattern =
+    /(?:\p{Regional_Indicator}{2}|[#*0-9]\uFE0F?\u20E3|\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?(?:\p{Emoji_Modifier})?(?:\u200D\p{Extended_Pictographic}(?:\uFE0F|\uFE0E)?(?:\p{Emoji_Modifier})?)*)/gu;
+
+  return String(value)
+    .replace(emojiPattern, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
 }
 
 async function translateForChat(env, text, source, target) {
