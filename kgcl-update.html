@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KGCL Update</title>
+</head>
+<body>
+  <p>Preparing the latest KGCL update…</p>
+
+  <script>
+    fetch(
+      "https://kgcl-api.hqkeram.workers.dev/api/app-update",
+      { cache: "no-store" }
+    )
+      .then((response) => response.json())
+      .then((update) => {
+        window.location.replace(update.apkUrl);
+      })
+      .catch(() => {
+        document.body.innerHTML =
+          "<p>Could not load the KGCL update. Please try again.</p>";
+      });
+  </script>
+</body>
+</html>
