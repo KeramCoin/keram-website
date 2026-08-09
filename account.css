@@ -126,3 +126,23 @@
 .account-page #change-password-button[hidden] {
   display: none !important;
 }
+
+.account-page .danger-link-button {
+  color: #ff9e9e;
+}
+
+.account-page .danger-form {
+  margin: 18px 0 0;
+}
+
+.account-page .danger-form[hidden],
+.account-page #delete-confirmation-note[hidden],
+.account-page #delete-account-button[hidden] {
+  display: none !important;
+}
+
+.account-page .danger-delete-button {
+  border-color: #b93e3e;
+  background: linear-gradient(135deg, #9b2525, #d34848);
+  color: #fff;
+}

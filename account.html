@@ -327,9 +327,69 @@
         and data. This cannot be undone.
       </p>
 
-      <p class="danger-zone-confirmation">
-        Deletion will require your password and typing DELETE.
+      <p
+        id="delete-confirmation-note"
+        class="danger-zone-confirmation"
+      >
+        Deletion requires your password and typing DELETE.
       </p>
+
+      <button
+        id="delete-account-button"
+        class="account-text-button danger-link-button"
+        type="button"
+      >
+        Delete account
+      </button>
+
+      <form
+        id="delete-account-form"
+        class="account-form danger-form"
+        hidden
+      >
+        <label for="delete-current-password-input">
+          Current password
+        </label>
+
+        <input
+          id="delete-current-password-input"
+          type="password"
+          autocomplete="current-password"
+          required
+        >
+
+        <label for="delete-confirmation-input">
+          Type DELETE to confirm
+        </label>
+
+        <input
+          id="delete-confirmation-input"
+          type="text"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          pattern="DELETE"
+          required
+        >
+
+        <p class="profile-form-actions">
+          <button
+            id="confirm-delete-account-button"
+            class="btn danger-delete-button"
+            type="submit"
+          >
+            Delete account permanently
+          </button>
+
+          <button
+            id="cancel-delete-account-button"
+            class="account-text-button"
+            type="button"
+          >
+            Cancel
+          </button>
+        </p>
+      </form>
     </section>
 
     <p class="account-actions">
@@ -438,6 +498,31 @@
   const cancelPasswordButton =
     document.getElementById("cancel-password-button");
 
+  const deleteConfirmationNote =
+    document.getElementById("delete-confirmation-note");
+
+  const deleteAccountButton =
+    document.getElementById("delete-account-button");
+
+  const deleteAccountForm =
+    document.getElementById("delete-account-form");
+
+  const deleteCurrentPasswordInput =
+    document.getElementById("delete-current-password-input");
+
+  const deleteConfirmationInput =
+    document.getElementById("delete-confirmation-input");
+
+  const confirmDeleteAccountButton =
+    document.getElementById(
+      "confirm-delete-account-button"
+    );
+
+  const cancelDeleteAccountButton =
+    document.getElementById(
+      "cancel-delete-account-button"
+    );
+
     const accountStatus =
       document.getElementById("account-status");
 
@@ -506,6 +591,7 @@
 
     setProfileEditorVisible(false);
     setPasswordFormVisible(false);
+    setDeleteFormVisible(false);
   }
 
   function setProfileEditorVisible(isVisible) {
@@ -575,6 +661,42 @@
     if (!response.ok) {
       throw new Error(
         data.error || "Password could not be changed."
+      );
+    }
+
+    return data;
+  }
+
+  function setDeleteFormVisible(isVisible) {
+    deleteConfirmationNote.hidden = isVisible;
+    deleteAccountButton.hidden = isVisible;
+    deleteAccountForm.hidden = !isVisible;
+  }
+
+  async function deleteCurrentAccount(body) {
+    const session = getStoredSession();
+
+    if (!session || !session.token) {
+      throw new Error("Sign in is required.");
+    }
+
+    const response = await fetch(
+      `${API_URL}/api/accounts/me`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.token}`
+        },
+        body: JSON.stringify(body)
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Account could not be deleted."
       );
     }
 
@@ -872,7 +994,80 @@
         savePasswordButton.disabled = false;
       }
     }
+  );deleteAccountButton.addEventListener(
+    "click",
+    () => {
+      setDeleteFormVisible(true);
+      deleteCurrentPasswordInput.focus();
+    }
   );
+
+  cancelDeleteAccountButton.addEventListener(
+    "click",
+    () => {
+      deleteAccountForm.reset();
+      setDeleteFormVisible(false);
+      accountStatus.textContent = "";
+    }
+  );
+
+  deleteAccountForm.addEventListener(
+    "submit",
+    async (event) => {
+      event.preventDefault();
+
+      const currentPassword =
+        deleteCurrentPasswordInput.value;
+
+      const confirmation =
+        deleteConfirmationInput.value.trim();
+
+      if (confirmation !== "DELETE") {
+        accountStatus.textContent =
+          "Type DELETE to confirm account deletion.";
+        return;
+      }
+
+      accountStatus.textContent =
+        "Deleting account permanently…";
+
+      confirmDeleteAccountButton.disabled = true;
+
+      try {
+        const data = await deleteCurrentAccount({
+          currentPassword,
+          confirmation
+        });
+
+        if (!data.deleted) {
+          throw new Error(
+            "Account could not be deleted."
+          );
+        }
+
+        localStorage.removeItem(
+          ACCOUNT_STORAGE_KEY
+        );
+
+        accountStatus.textContent =
+          "Account permanently deleted. Returning home…";
+
+        window.setTimeout(
+          () => {
+            window.location.href = "index.html";
+          },
+          1200
+        );
+      } catch (error) {
+        accountStatus.textContent =
+          error.message;
+      } finally {
+        confirmDeleteAccountButton.disabled = false;
+      }
+    }
+  );
+
+
 
 
 

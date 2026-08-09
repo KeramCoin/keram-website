@@ -19,7 +19,7 @@ function cors(request) {
     "Access-Control-Allow-Origin": ORIGINS.has(origin)
       ? origin
       : "https://k3ram.com",
-    "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
     "Access-Control-Allow-Headers":
     "Content-Type, X-Room-Code, Authorization",
     "Vary": "Origin"
@@ -775,6 +775,86 @@ async function loginAccount(request, env) {
   });
 }
 
+async function deleteCurrentAccount(request, env) {
+  const account = await getAccountFromSession(
+    request,
+    env
+  );
+
+  if (!account) {
+    return json(request, {
+      error: "Sign in is required."
+    }, 401);
+  }
+
+  const data = await request.json();
+
+  const currentPassword = String(
+    data.currentPassword || ""
+  );
+
+  const confirmation = String(
+    data.confirmation || ""
+  ).trim();
+
+  if (!currentPassword) {
+    return json(request, {
+      error: "Enter your current password."
+    }, 400);
+  }
+
+  if (confirmation !== "DELETE") {
+    return json(request, {
+      error: 'Type DELETE to confirm account deletion.'
+    }, 400);
+  }
+
+  const credentials = await env.DB.prepare(`
+    SELECT
+      password_hash,
+      password_salt
+    FROM accounts
+    WHERE id = ?
+    LIMIT 1
+  `).bind(
+    Number(account.id)
+  ).first();
+
+  const currentPasswordHash = await hashPassword(
+    currentPassword,
+    credentials.password_salt
+  );
+
+  if (
+    !valuesMatch(
+      currentPasswordHash,
+      credentials.password_hash
+    )
+  ) {
+    return json(request, {
+      error: "Current password is incorrect."
+    }, 401);
+  }
+
+  await env.DB.prepare(`
+    DELETE FROM account_sessions
+    WHERE account_id = ?
+  `).bind(
+    Number(account.id)
+  ).run();
+
+  await env.DB.prepare(`
+    DELETE FROM accounts
+    WHERE id = ?
+  `).bind(
+    Number(account.id)
+  ).run();
+
+  return json(request, {
+    deleted: true
+  });
+}
+
 async function changeAccountPassword(request, env) {
   const account = await getAccountFromSession(
     request,
@@ -1467,6 +1547,13 @@ export default {
       ) {
         return await loginAccount(request, env);
       }  if (
+    request.method === "DELETE" &&
+    url.pathname === "/api/accounts/me"
+  ) {
+    return await deleteCurrentAccount(request, env);
+  }
+
+  if (
     request.method === "PATCH" &&
     url.pathname === "/api/accounts/me/password"
   ) {
