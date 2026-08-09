@@ -334,6 +334,7 @@
 
           accountStatus.textContent =
             "Your KERAM account is ready.";
+          window.location.href = "index.html";
         } catch (error) {
           accountStatus.textContent =
             error.message;
@@ -384,6 +385,7 @@
 
           accountStatus.textContent =
             "Signed in to KERAM.";
+          window.location.href = "index.html";
         } catch (error) {
           accountStatus.textContent =
             error.message;
@@ -396,6 +398,7 @@
       () => {
         clearAccountSession();
         accountStatus.textContent = "Signed out.";
+        window.location.href = "index.html";
       }
     );
 
