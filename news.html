@@ -1,102 +1,230 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>News | KERAM</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/png" href="assets/favicon.png">
+  <title>KERAM News</title>
+  <link rel="stylesheet" href="style.css?v=9">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+
+  <style>
+    .news-page {
+      width: min(1180px, calc(100% - 48px));
+      margin: 42px auto 80px;
+    }
+
+    .news-head {
+      padding-bottom: 28px;
+    }
+
+    .news-label {
+      margin: 0 0 8px;
+      color: #d4af37;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+    }
+
+    .news-head h1 {
+      margin: 0 0 10px;
+    }
+
+    .news-intro {
+      max-width: 760px;
+      margin: 0;
+      opacity: 0.82;
+      line-height: 1.7;
+    }
+
+    .news-date {
+      margin: 28px 0 0;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      opacity: 0.78;
+    }
+
+    .news-story {
+      padding: 32px 0;
+      border-top: 1px solid rgba(212, 175, 55, 0.32);
+    }
+
+    .news-category {
+      margin: 0 0 10px;
+      color: #d4af37;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+    }
+
+    .news-story h2 {
+      margin: 0 0 16px;
+      font-size: clamp(1.35rem, 2vw, 1.8rem);
+    }
+
+    .news-story p {
+      max-width: 900px;
+      line-height: 1.75;
+    }
+
+    .news-source {
+      color: #d4af37;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .news-source:hover {
+      text-decoration: underline;
+    }
+
+    .news-talk {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .news-talk a {
+      color: #d4af37;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .news-talk a:hover {
+      text-decoration: underline;
+    }
+
+    .build-today {
+      padding: 34px 0 10px;
+      border-top: 1px solid rgba(212, 175, 55, 0.32);
+      text-align: center;
+    }
+
+    .build-today-title {
+      color: #d4af37;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+    }
+
+    .news-back {
+      margin-top: 40px;
+      text-align: center;
+    }
+
+    .news-back a {
+      color: #d4af37;
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      .news-page {
+        width: min(100% - 28px, 1180px);
+        margin-top: 28px;
+      }
+
+      .news-talk {
+        justify-content: flex-start;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div class="page-bg"></div>
 
-<nav class="nav">
-    <a class="brand" href="index.html#home">KERAM</a>
+  <main class="news-page">
 
-    <div class="nav-links">
-        <a href="index.html">← Back to Home</a>
+    <section class="news-head">
+      <p class="news-label">KERAM MORNING BRIEF</p>
+      <h1>KERAM News</h1>
+
+      <p class="news-intro">
+        A short, clear morning overview of the world, crypto and things worth talking about.
+      </p>
+
+      <p class="news-date">MONDAY • AUGUST 10, 2026</p>
+    </section>
+
+    <article class="news-story">
+      <p class="news-category">₿ CRYPTO</p>
+
+      <h2>U.S. Senate moves the CLARITY Act forward</h2>
+
+      <p>
+        United States senators moved the CLARITY Act forward. The bill could define more clearly
+        which crypto assets fall under securities rules and which under commodities rules.
+        A final Senate vote is expected after the August recess.
+      </p>
+
+      <p>
+        <strong>Why it matters:</strong>
+        Clearer rules could make it easier for builders, companies and everyday users
+        to understand the ground beneath their feet.
+      </p>
+
+      <p>
+        <a
+          class="news-source"
+          href="https://www.reuters.com/legal/government/us-senate-advances-landmark-crypto-bill-before-heading-august-recess-2026-08-08/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Read the Reuters report →
+        </a>
+      </p>
+
+      <div class="news-talk">
+        <a href="builder-chat.html">Talk about it. 💬</a>
+      </div>
+    </article>
+
+    <article class="news-story">
+      <p class="news-category">💡 LEARN</p>
+
+      <h2>One calm rule beats a rushed click.</h2>
+
+      <p>
+        As crypto rules change across Europe, scammers are posing as platforms and regulators.
+        If a message tells you to move funds quickly, stop. Open the official website or app
+        yourself and verify it there.
+      </p>
+
+      <p>
+        <strong>Why it matters:</strong>
+        One rushed transfer can erase months of honest work.
+      </p>
+
+      <p>
+        <a
+          class="news-source"
+          href="https://www.ft.com/content/b0b7db1d-5c9e-42d7-8aed-176e0acd00a9"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Read the Financial Times report →
+        </a>
+      </p>
+
+      <div class="news-talk">
+        <a href="builder-chat.html">Talk about it. 💬</a>
+      </div>
+    </article>
+
+    <section class="build-today">
+      <p class="build-today-title">KERAM · BUILD TODAY</p>
+
+      <p>
+        Make one honest move toward something that matters.
+        Create. Repair. Teach. Care. Keep going.
+      </p>
+
+      <p><strong>We are all builders.</strong></p>
+    </section>
+
+    <div class="news-back">
+      <a href="index.html">← Back to KERAM</a>
     </div>
-</nav>
 
-<section class="section">
-
-    <div class="glass builder-page">
-
-        <h1>KERAM News</h1>
-
-        <p class="builder-subtitle">
-            KERAM Morning Brief.
-        </p>
-
-        <p class="builder-intro">A short, clear morning overview of the world, crypto and things worth talking about.</p>
-
-    <p><strong>MONDAY • AUGUST 10, 2026</strong></p>
-
-<div>
-    <p><strong>🌍 WORLD</strong></p>
-    <h2>Shipping routes are a world story, not just a map story.</h2>
-    <p>Talks around the Strait of Hormuz remain difficult. When a major sea route is uncertain, the effects can reach energy, transport and everyday prices far beyond the region.</p>
-    <p><a style="color: #d4af37;" href="https://www.reuters.com/world/asia-pacific/trump-says-iran-talks-take-place-monday-sets-no-deadline-deal-2026-08-02/" target="_blank" rel="noopener noreferrer">Read the Reuters report →</a></p>
-    <p><strong>Talk about it. 💬</strong></p>
-</div>
-
-<div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(212, 175, 55, 0.35);">
-    <p><strong>🔬 SCIENCE · 🌱 GOOD NEWS</strong></p>
-    <h2>Managed forests give giant sequoias a better chance against fire.</h2>
-    <p>A NASA-funded study found that giant sequoias were nearly four times more likely to survive extreme wildfire in forests managed with controlled burns.</p>
-    <p><strong>Why it matters:</strong> Good work done early can protect something valuable for generations.</p>
-    <p><a style="color: #d4af37;" href="https://science.nasa.gov/blogs/science-news/" target="_blank" rel="noopener noreferrer">Read the NASA science note →</a></p>
-</div>
-
-<div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(212, 175, 55, 0.35);">
-    <p><strong>🤖 TECH</strong></p>
-    <h2>The Roman Space Telescope is one step closer to launch.</h2>
-    <p>NASA has completed fueling the Nancy Grace Roman Space Telescope, a major milestone before its planned late-August launch.</p>
-    <p><strong>Why it matters:</strong> Big discoveries do not begin with a headline. They begin with thousands of careful steps that nobody sees.</p>
-    <p><a style="color: #d4af37;" href="https://science.nasa.gov/" target="_blank" rel="noopener noreferrer">Read NASA Science →</a></p>
-</div>
-
-<div class="news-item">
-        <h2>Crypto: Washington moves, but the final rules still wait.</h2>
-
-        <p>United States senators moved the CLARITY Act forward. The bill could define more clearly which crypto assets fall under securities rules and which under commodities rules. A final Senate vote is expected after the August recess.</p>
-
-        <p><strong>Why it matters:</strong> Clearer rules could make it easier for builders, companies and everyday users to understand the ground beneath their feet.</p>
-
-        <p><a style="color: #d4af37;" href="https://www.reuters.com/legal/government/us-senate-advances-landmark-crypto-bill-before-heading-august-recess-2026-08-08/" target="_blank" rel="noopener noreferrer">Read the Reuters report →</a></p>
-
-        <p><strong>Talk about it. 💬</strong></p>
-    </div>
-
-    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(212, 175, 55, 0.35);">
-        <p><strong>💡 LEARN</strong></p>
-
-        <h2>One calm rule beats a rushed click.</h2>
-
-        <p>As crypto rules change across Europe, scammers are posing as platforms and regulators. If a message tells you to move funds quickly, stop. Open the official website or app yourself and verify it there.</p>
-
-        <p><strong>Why it matters:</strong> One rushed transfer can erase months of honest work.</p>
-
-        <p><a style="color: #d4af37;" href="https://www.ft.com/content/b0b7db1d-5c9e-42d7-8aed-176e0acd00a9" target="_blank" rel="noopener noreferrer">Read the Financial Times report →</a></p>
-
-        <p><strong>Talk about it. 💬</strong></p>
-    </div>
-
-    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(212, 175, 55, 0.35); text-align: center;">
-        <p><strong>🧱 KERAM · BUILD TODAY</strong></p>
-        <p>Make one honest move toward something that matters. Create. Repair. Teach. Care. Keep going.</p>
-        <p><strong>We are all builders.</strong></p>
-    </div>
-
-</div>
-
-</section>
-
+  </main>
 </body>
 </html>
-</div>
-</section>
-</body>
-</html>
-</div></section></body></html>
