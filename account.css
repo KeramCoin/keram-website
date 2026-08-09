@@ -116,3 +116,13 @@
 .account-page .profile-form[hidden] {
   display: none !important;
 }
+
+.account-page .security-form {
+  margin: 18px 0 0;
+}
+
+.account-page .security-form[hidden],
+.account-page #security-note[hidden],
+.account-page #change-password-button[hidden] {
+  display: none !important;
+}

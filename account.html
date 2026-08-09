@@ -240,9 +240,81 @@
       <section class="account-space-card">
         <h3>Security</h3>
 
-        <p class="account-card-note">
-          Password, active sign-ins and later two-factor authentication.
+        <p
+          id="security-note"
+          class="account-card-note"
+        >
+          Change your password. Other active sign-ins will be signed out.
         </p>
+
+        <button
+          id="change-password-button"
+          class="account-text-button"
+          type="button"
+        >
+          Change password
+        </button>
+
+        <form
+          id="password-form"
+          class="account-form security-form"
+          hidden
+        >
+          <label for="current-password-input">
+            Current password
+          </label>
+
+          <input
+            id="current-password-input"
+            type="password"
+            autocomplete="current-password"
+            required
+          >
+
+          <label for="new-password-input">
+            New password
+          </label>
+
+          <input
+            id="new-password-input"
+            type="password"
+            autocomplete="new-password"
+            minlength="8"
+            maxlength="128"
+            required
+          >
+
+          <label for="confirm-new-password-input">
+            Confirm new password
+          </label>
+
+          <input
+            id="confirm-new-password-input"
+            type="password"
+            autocomplete="new-password"
+            minlength="8"
+            maxlength="128"
+            required
+          >
+
+          <p class="profile-form-actions">
+            <button
+              id="save-password-button"
+              class="btn btn-gold"
+              type="submit"
+            >
+              Update password
+            </button>
+
+            <button
+              id="cancel-password-button"
+              class="account-text-button"
+              type="button"
+            >
+              Cancel
+            </button>
+          </p>
+        </form>
       </section>
     </div>
 
@@ -342,6 +414,30 @@
   const cancelProfileButton =
     document.getElementById("cancel-profile-button");
 
+  const securityNoteElement =
+    document.getElementById("security-note");
+
+  const changePasswordButton =
+    document.getElementById("change-password-button");
+
+  const passwordForm =
+    document.getElementById("password-form");
+
+  const currentPasswordInput =
+    document.getElementById("current-password-input");
+
+  const newPasswordInput =
+    document.getElementById("new-password-input");
+
+  const confirmNewPasswordInput =
+    document.getElementById("confirm-new-password-input");
+
+  const savePasswordButton =
+    document.getElementById("save-password-button");
+
+  const cancelPasswordButton =
+    document.getElementById("cancel-password-button");
+
     const accountStatus =
       document.getElementById("account-status");
 
@@ -409,6 +505,7 @@
       account.preferredLanguage;
 
     setProfileEditorVisible(false);
+    setPasswordFormVisible(false);
   }
 
   function setProfileEditorVisible(isVisible) {
@@ -442,6 +539,42 @@
     if (!response.ok) {
       throw new Error(
         data.error || "Profile could not be updated."
+      );
+    }
+
+    return data;
+  }
+
+  function setPasswordFormVisible(isVisible) {
+    securityNoteElement.hidden = isVisible;
+    changePasswordButton.hidden = isVisible;
+    passwordForm.hidden = !isVisible;
+  }
+
+  async function changeAccountPassword(body) {
+    const session = getStoredSession();
+
+    if (!session || !session.token) {
+      throw new Error("Sign in is required.");
+    }
+
+    const response = await fetch(
+      `${API_URL}/api/accounts/me/password`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.token}`
+        },
+        body: JSON.stringify(body)
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Password could not be changed."
       );
     }
 
@@ -674,7 +807,74 @@
         saveProfileButton.disabled = false;
       }
     }
+  );changePasswordButton.addEventListener(
+    "click",
+    () => {
+      setPasswordFormVisible(true);
+      currentPasswordInput.focus();
+    }
   );
+
+  cancelPasswordButton.addEventListener(
+    "click",
+    () => {
+      passwordForm.reset();
+      setPasswordFormVisible(false);
+      accountStatus.textContent = "";
+    }
+  );
+
+  passwordForm.addEventListener(
+    "submit",
+    async (event) => {
+      event.preventDefault();
+
+      const currentPassword =
+        currentPasswordInput.value;
+
+      const newPassword =
+        newPasswordInput.value;
+
+      const confirmation =
+        confirmNewPasswordInput.value;
+
+      if (newPassword !== confirmation) {
+        accountStatus.textContent =
+          "New passwords do not match.";
+        return;
+      }
+
+      accountStatus.textContent =
+        "Changing password…";
+
+      savePasswordButton.disabled = true;
+
+      try {
+        const data = await changeAccountPassword({
+          currentPassword,
+          newPassword
+        });
+
+        saveSession({
+          token: data.sessionToken,
+          expiresAt: data.sessionExpiresAt
+        });
+
+        passwordForm.reset();
+        showAccount(data.account);
+
+        accountStatus.textContent =
+          "Password changed. Other active sign-ins were signed out.";
+      } catch (error) {
+        accountStatus.textContent =
+          error.message;
+      } finally {
+        savePasswordButton.disabled = false;
+      }
+    }
+  );
+
+
 
 
 

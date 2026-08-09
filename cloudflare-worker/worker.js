@@ -775,6 +775,108 @@ async function loginAccount(request, env) {
   });
 }
 
+async function changeAccountPassword(request, env) {
+  const account = await getAccountFromSession(
+    request,
+    env
+  );
+
+  if (!account) {
+    return json(request, {
+      error: "Sign in is required."
+    }, 401);
+  }
+
+  const data = await request.json();
+
+  const currentPassword = String(
+    data.currentPassword || ""
+  );
+
+  const newPassword = String(
+    data.newPassword || ""
+  );
+
+  if (!currentPassword) {
+    return json(request, {
+      error: "Enter your current password."
+    }, 400);
+  }
+
+  if (
+    newPassword.length < 8 ||
+    newPassword.length > 128
+  ) {
+    return json(request, {
+      error:
+        "New password must contain 8–128 characters."
+    }, 400);
+  }
+
+  const credentials = await env.DB.prepare(`
+    SELECT
+      password_hash,
+      password_salt
+    FROM accounts
+    WHERE id = ?
+    LIMIT 1
+  `).bind(
+    Number(account.id)
+  ).first();
+
+  const currentPasswordHash = await hashPassword(
+    currentPassword,
+    credentials.password_salt
+  );
+
+  if (
+    !valuesMatch(
+      currentPasswordHash,
+      credentials.password_hash
+    )
+  ) {
+    return json(request, {
+      error: "Current password is incorrect."
+    }, 401);
+  }
+
+  const passwordSalt = createSecureValue(16);
+  const passwordHash = await hashPassword(
+    newPassword,
+    passwordSalt
+  );
+
+  await env.DB.prepare(`
+    UPDATE accounts
+    SET
+      password_hash = ?,
+      password_salt = ?
+    WHERE id = ?
+  `).bind(
+    passwordHash,
+    passwordSalt,
+    Number(account.id)
+  ).run();
+
+  await env.DB.prepare(`
+    DELETE FROM account_sessions
+    WHERE account_id = ?
+  `).bind(
+    Number(account.id)
+  ).run();
+
+  const session = await createAccountSession(
+    env,
+    Number(account.id)
+  );
+
+  return json(request, {
+    account: accountResponse(account),
+    sessionToken: session.token,
+    sessionExpiresAt: session.expiresAt
+  });
+}
+
 async function updateCurrentAccount(request, env) {
   const account = await getAccountFromSession(
     request,
@@ -1364,7 +1466,14 @@ export default {
         url.pathname === "/api/accounts/login"
       ) {
         return await loginAccount(request, env);
-      }
+      }  if (
+    request.method === "PATCH" &&
+    url.pathname === "/api/accounts/me/password"
+  ) {
+    return await changeAccountPassword(request, env);
+  }
+
+
 
       if (
     request.method === "PATCH" &&
