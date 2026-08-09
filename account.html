@@ -14,6 +14,7 @@
     type="image/png"
     href="assets/favicon.png"
   >
+  <link rel="stylesheet" href="account.css">
 </head>
 <body>
   <div class="page-bg"></div>
@@ -130,20 +131,155 @@
       </div>
 
       <div id="account-member" hidden>
-        <p class="account-welcome">
-          Welcome, <strong id="account-name"></strong>.
+    <header class="account-profile-heading">
+      <p class="profile-eyebrow">MY PROFILE</p>
+      <h2 id="profile-display-name"></h2>
+      <p id="profile-username" class="profile-username"></p>
+
+      <p class="profile-intro">
+        Your personal space in the KERAM community.
+      </p>
+    </header>
+
+    <div class="account-space-grid">
+      <section class="account-space-card">
+        <h3>My Profile</h3>
+
+        <dl class="profile-list">
+          <div>
+            <dt>Name</dt>
+            <dd id="profile-name"></dd>
+          </div>
+
+          <div>
+            <dt>Username</dt>
+            <dd id="profile-handle"></dd>
+          </div>
+
+          <div>
+            <dt>Language</dt>
+            <dd id="profile-language"></dd>
+          </div>
+        </dl>
+
+        <p
+          id="profile-note"
+          class="account-card-note"
+        >
+          Photo, bio, work and projects come next.
         </p>
 
-        <p id="account-details" class="account-details"></p>
-      <p class="account-actions">
-        <button class="btn btn-gold" type="button" id="change-user-button">Change user</button>
-        <button class="account-text-button" type="button" id="sign-out-button">Sign out</button>
+        <button
+          id="edit-profile-button"
+          class="account-text-button"
+          type="button"
+        >
+          Edit profile
+        </button>
+
+        <form
+          id="profile-form"
+          class="account-form profile-form"
+          hidden
+        >
+          <label for="profile-display-name-input">Name</label>
+
+          <input
+            id="profile-display-name-input"
+            type="text"
+            maxlength="40"
+            required
+          >
+
+          <label for="profile-username-input">Username</label>
+
+          <input
+            id="profile-username-input"
+            type="text"
+            maxlength="30"
+            required
+          >
+
+          <label for="profile-language-input">Language</label>
+
+          <select id="profile-language-input" required>
+            <option value="hr">Hrvatski</option>
+            <option value="en">English</option>
+            <option value="ru">Русский</option>
+            <option value="it">Italiano</option>
+          </select>
+
+          <p class="profile-form-actions">
+            <button
+              id="save-profile-button"
+              class="btn btn-gold"
+              type="submit"
+            >
+              Save changes
+            </button>
+
+            <button
+              id="cancel-profile-button"
+              class="account-text-button"
+              type="button"
+            >
+              Cancel
+            </button>
+          </p>
+        </form>
+      </section>
+
+      <section class="account-space-card">
+        <h3>Settings</h3>
+
+        <p class="account-card-note">
+          Privacy, notifications, chat preferences and language.
+        </p>
+      </section>
+
+      <section class="account-space-card">
+        <h3>Security</h3>
+
+        <p class="account-card-note">
+          Password, active sign-ins and later two-factor authentication.
+        </p>
+      </section>
+    </div>
+
+    <section class="danger-zone" aria-labelledby="danger-zone-title">
+      <p class="profile-eyebrow">DANGER ZONE</p>
+      <h3 id="danger-zone-title">Delete account</h3>
+
+      <p>
+        Deleting your account permanently removes your KERAM profile
+        and data. This cannot be undone.
       </p>
 
-      </div>
+      <p class="danger-zone-confirmation">
+        Deletion will require your password and typing DELETE.
+      </p>
+    </section>
 
-      <p
-        id="account-status"
+    <p class="account-actions">
+      <button
+        class="btn btn-gold"
+        type="button"
+        id="change-user-button"
+      >
+        Change user
+      </button>
+
+      <button
+        class="account-text-button"
+        type="button"
+        id="sign-out-button"
+      >
+        Sign out
+      </button>
+    </p>
+  </div>
+
+  <p id="account-status"
         class="account-status"
         role="status"
         aria-live="polite"
@@ -164,11 +300,47 @@
     const memberElement =
       document.getElementById("account-member");
 
-    const accountNameElement =
-      document.getElementById("account-name");
+    const profileDisplayNameElement =
+    document.getElementById("profile-display-name");
 
-    const accountDetailsElement =
-      document.getElementById("account-details");
+  const profileUsernameElement =
+    document.getElementById("profile-username");
+
+  const profileNameElement =
+    document.getElementById("profile-name");
+
+  const profileHandleElement =
+    document.getElementById("profile-handle");
+
+  const profileLanguageElement =
+    document.getElementById("profile-language");
+
+  const profileListElement =
+    document.querySelector(".profile-list");
+
+  const profileNoteElement =
+    document.getElementById("profile-note");
+
+  const editProfileButton =
+    document.getElementById("edit-profile-button");
+
+  const profileForm =
+    document.getElementById("profile-form");
+
+  const profileDisplayNameInput =
+    document.getElementById("profile-display-name-input");
+
+  const profileUsernameInput =
+    document.getElementById("profile-username-input");
+
+  const profileLanguageInput =
+    document.getElementById("profile-language-input");
+
+  const saveProfileButton =
+    document.getElementById("save-profile-button");
+
+  const cancelProfileButton =
+    document.getElementById("cancel-profile-button");
 
     const accountStatus =
       document.getElementById("account-status");
@@ -208,17 +380,75 @@
     }
 
     function showAccount(account) {
-      guestElement.hidden = true;
-      memberElement.hidden = false;
+    guestElement.hidden = true;
+    memberElement.hidden = false;
 
-      accountNameElement.textContent =
-        account.displayName;
+    const handle = `@${account.username}`;
+    const language =
+      account.preferredLanguage.toUpperCase();
 
-      accountDetailsElement.textContent =
-        `@${account.username} · ${account.preferredLanguage.toUpperCase()}`;
+    profileDisplayNameElement.textContent =
+      account.displayName;
+
+    profileUsernameElement.textContent = handle;
+
+    profileNameElement.textContent =
+      account.displayName;
+
+    profileHandleElement.textContent = handle;
+
+    profileLanguageElement.textContent = language;
+
+    profileDisplayNameInput.value =
+      account.displayName;
+
+    profileUsernameInput.value =
+      account.username;
+
+    profileLanguageInput.value =
+      account.preferredLanguage;
+
+    setProfileEditorVisible(false);
+  }
+
+  function setProfileEditorVisible(isVisible) {
+    profileListElement.hidden = isVisible;
+    profileNoteElement.hidden = isVisible;
+    editProfileButton.hidden = isVisible;
+    profileForm.hidden = !isVisible;
+  }
+
+  async function updateCurrentAccount(body) {
+    const session = getStoredSession();
+
+    if (!session || !session.token) {
+      throw new Error("Sign in is required.");
     }
 
-    function showGuest() {
+    const response = await fetch(
+      `${API_URL}/api/accounts/me`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.token}`
+        },
+        body: JSON.stringify(body)
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Profile could not be updated."
+      );
+    }
+
+    return data;
+  }
+
+  function showGuest() {
       guestElement.hidden = false;
       memberElement.hidden = true;
     }
@@ -334,7 +564,7 @@
 
           accountStatus.textContent =
             "Your KERAM account is ready.";
-          window.location.href = "index.html";
+
         } catch (error) {
           accountStatus.textContent =
             error.message;
@@ -385,13 +615,68 @@
 
           accountStatus.textContent =
             "Signed in to KERAM.";
-          window.location.href = "index.html";
+
         } catch (error) {
           accountStatus.textContent =
             error.message;
         }
       }
-    );
+    );editProfileButton.addEventListener(
+    "click",
+    () => {
+      setProfileEditorVisible(true);
+      profileDisplayNameInput.focus();
+    }
+  );
+
+  cancelProfileButton.addEventListener(
+    "click",
+    () => {
+      setProfileEditorVisible(false);
+      accountStatus.textContent = "";
+    }
+  );
+
+  profileForm.addEventListener(
+    "submit",
+    async (event) => {
+      event.preventDefault();
+
+      const username =
+        profileUsernameInput.value.trim();
+
+      const displayName =
+        profileDisplayNameInput.value.trim();
+
+      const preferredLanguage =
+        profileLanguageInput.value;
+
+      accountStatus.textContent =
+        "Saving profile…";
+
+      saveProfileButton.disabled = true;
+
+      try {
+        const data = await updateCurrentAccount({
+          username,
+          displayName,
+          preferredLanguage
+        });
+
+        showAccount(data.account);
+
+        accountStatus.textContent =
+          "Profile updated.";
+      } catch (error) {
+        accountStatus.textContent =
+          error.message;
+      } finally {
+        saveProfileButton.disabled = false;
+      }
+    }
+  );
+
+
 
     signOutButton.addEventListener(
       "click",

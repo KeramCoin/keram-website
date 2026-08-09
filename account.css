@@ -1,0 +1,118 @@
+.account-page .account-profile-heading {
+  margin: 28px 0 22px;
+}
+
+.account-page .profile-eyebrow {
+  margin: 0 0 8px;
+  color: #f4c95d;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+}
+
+.account-page .account-profile-heading h2 {
+  margin: 0;
+  color: #f4f4f4;
+  font-size: 2rem;
+}
+
+.account-page .profile-username {
+  margin: 7px 0 0;
+  color: #f4c95d;
+  font-weight: 700;
+}
+
+.account-page .profile-intro,
+.account-page .account-card-note {
+  color: #aeb5c0;
+  line-height: 1.6;
+}
+
+.account-page .account-space-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.account-page .account-space-card {
+  padding: 20px;
+  border: 1px solid rgba(244, 201, 93, 0.2);
+  border-radius: 14px;
+  background: rgba(6, 14, 23, 0.56);
+}
+
+.account-page .account-space-card h3,
+.account-page .danger-zone h3 {
+  margin: 0;
+  color: #f4f4f4;
+}
+
+.account-page .profile-list {
+  margin: 18px 0;
+}
+
+.account-page .profile-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.account-page .profile-list dt {
+  color: #aeb5c0;
+}
+
+.account-page .profile-list dd {
+  margin: 0;
+  color: #f4c95d;
+  font-weight: 700;
+}
+
+.account-page .danger-zone {
+  margin-top: 26px;
+  padding: 20px;
+  border: 1px solid rgba(211, 75, 75, 0.55);
+  border-radius: 14px;
+  background: rgba(91, 17, 17, 0.3);
+}
+
+.account-page .danger-zone > p:not(.profile-eyebrow) {
+  color: #e3b9b9;
+  line-height: 1.6;
+}
+
+.account-page .danger-zone-confirmation {
+  margin-bottom: 0;
+  color: #f4c95d !important;
+  font-weight: 700;
+}
+
+.account-page .account-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 24px 0 0;
+}
+
+.account-page .profile-form {
+  margin: 18px 0 0;
+}
+
+.account-page .profile-form-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 20px 0 0;
+}
+
+.account-page .profile-list[hidden],
+.account-page #profile-note[hidden],
+.account-page #edit-profile-button[hidden] {
+  display: none !important;
+}
+
+.account-page .profile-form[hidden] {
+  display: none !important;
+}

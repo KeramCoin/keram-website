@@ -775,6 +775,100 @@ async function loginAccount(request, env) {
   });
 }
 
+async function updateCurrentAccount(request, env) {
+  const account = await getAccountFromSession(
+    request,
+    env
+  );
+
+  if (!account) {
+    return json(request, {
+      error: "Sign in is required."
+    }, 401);
+  }
+
+  const data = await request.json();
+
+  const username = String(
+    data.username || ""
+  ).trim();
+
+  const displayName = String(
+    data.displayName || ""
+  ).trim();
+
+  const preferredLanguage = String(
+    data.preferredLanguage || ""
+  ).trim().toLowerCase();
+
+  if (!/^[a-zA-Z0-9._-]{3,30}$/.test(username)) {
+    return json(request, {
+      error:
+        "Username must contain 3–30 letters, numbers, dots, hyphens or underscores."
+    }, 400);
+  }
+
+  if (!displayName || displayName.length > 40) {
+    return json(request, {
+      error:
+        "Display name must contain 1–40 characters."
+    }, 400);
+  }
+
+  if (!LANGUAGES.has(preferredLanguage)) {
+    return json(request, {
+      error: "Choose a supported preferred language."
+    }, 400);
+  }
+
+  try {
+    await env.DB.prepare(`
+      UPDATE accounts
+      SET
+        username = ?,
+        display_name = ?,
+        preferred_language = ?
+      WHERE id = ?
+    `).bind(
+      username,
+      displayName,
+      preferredLanguage,
+      Number(account.id)
+    ).run();
+
+    const updatedAccount = await env.DB.prepare(`
+      SELECT
+        id,
+        username,
+        display_name,
+        email,
+        preferred_language,
+        created_at
+      FROM accounts
+      WHERE id = ?
+      LIMIT 1
+    `).bind(
+      Number(account.id)
+    ).first();
+
+    return json(request, {
+      account: accountResponse(updatedAccount)
+    });
+  } catch (error) {
+    if (
+      String(error.message).includes(
+        "UNIQUE constraint failed"
+      )
+    ) {
+      return json(request, {
+        error: "That username is already in use."
+      }, 409);
+    }
+
+    throw error;
+  }
+}
+
 async function getCurrentAccount(request, env) {
   const account = await getAccountFromSession(
     request,
@@ -1273,6 +1367,13 @@ export default {
       }
 
       if (
+    request.method === "PATCH" &&
+    url.pathname === "/api/accounts/me"
+  ) {
+    return await updateCurrentAccount(request, env);
+  }
+
+  if (
         request.method === "GET" &&
         url.pathname === "/api/accounts/me"
       ) {
