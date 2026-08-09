@@ -197,6 +197,61 @@ function roomHeaders(includeContentType = false) {
     return headers;
 }
 
+const ACCOUNT_STORAGE_KEY = "keramAccountSession";
+
+async function restoreAccountIdentity() {
+    let session = null;
+
+    try {
+        session = JSON.parse(
+            localStorage.getItem(ACCOUNT_STORAGE_KEY) || "null"
+        );
+    } catch (error) {
+        return;
+    }
+
+    if (!session || !session.token) {
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `${API_URL}/api/accounts/me`,
+            {
+                headers: {
+                    Authorization: `Bearer ${session.token}`
+                }
+            }
+        );
+
+        if (!response.ok) {
+            return;
+        }
+
+        const data = await response.json();
+        const account = data.account;
+
+        usernameInput.value = `@${account.username}`;
+        usernameInput.dataset.accountUsername = account.username;
+        usernameInput.readOnly = true;
+        usernameInput.autocomplete = "off";
+        usernameInput.setAttribute(
+            "aria-label",
+            `Signed in as @${account.username}`
+        );
+
+        if (
+            Array.from(languageSelect.options).some(
+                (option) => option.value === account.preferredLanguage
+            )
+        ) {
+            languageSelect.value = account.preferredLanguage;
+        }
+    } catch (error) {
+        console.info("KERAM account identity unavailable.");
+    }
+}
+
 function getAuthorKey() {
     let authorKey =
         localStorage.getItem(AUTHOR_KEY_STORAGE_KEY);
@@ -557,6 +612,7 @@ form.addEventListener(
         }
 
         const username =
+            usernameInput.dataset.accountUsername ||
             usernameInput.value.trim();
 
         const message =
@@ -824,6 +880,8 @@ languageSelect.addEventListener(
     "change",
     loadMessages
 );
+
+restoreAccountIdentity();
 
 loadMessages();
 
